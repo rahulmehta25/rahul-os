@@ -1,0 +1,101 @@
+:root {
+  /* Background & Surface */
+  --color-bg-desktop: #1a1a2e;
+  --color-bg-surface: rgba(30, 30, 46, 0.85);
+  --color-bg-surface-solid: #1e1e2e;
+  --color-bg-titlebar: rgba(30, 30, 46, 0.95);
+  --color-bg-titlebar-inactive: rgba(40, 40, 56, 0.9);
+  --color-bg-dock: rgba(30, 30, 46, 0.75);
+  --color-bg-menubar: rgba(20, 20, 36, 0.8);
+  --color-bg-input: rgba(255, 255, 255, 0.06);
+  --color-bg-hover: rgba(255, 255, 255, 0.08);
+  --color-bg-active: rgba(255, 255, 255, 0.12);
+
+  /* Text */
+  --color-text-primary: #cdd6f4;
+  --color-text-secondary: #a6adc8;
+  --color-text-tertiary: #6c7086;
+  --color-text-inverse: #1e1e2e;
+
+  /* Accent */
+  --color-accent: #89b4fa;
+  --color-accent-hover: #74c7ec;
+  --color-accent-subtle: rgba(137, 180, 250, 0.15);
+
+  /* Traffic lights */
+  --color-close: #f38ba8;
+  --color-minimize: #f9e2af;
+  --color-maximize: #a6e3a1;
+  --color-traffic-inactive: #585b70;
+
+  /* Borders */
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-active: rgba(255, 255, 255, 0.15);
+
+  /* Shadows */
+  --shadow-window: 0 8px 32px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2);
+  --shadow-window-active: 0 12px 48px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-dock: 0 -4px 24px rgba(0, 0, 0, 0.3);
+  --shadow-menubar: 0 1px 8px rgba(0, 0, 0, 0.2);
+  --shadow-context-menu: 0 8px 24px rgba(0, 0, 0, 0.4);
+
+  /* Radii */
+  --radius-window: 12px;
+  --radius-dock: 16px;
+  --radius-button: 6px;
+  --radius-context-menu: 8px;
+
+  /* Spacing */
+  --titlebar-height: 38px;
+  --menubar-height: 28px;
+  --dock-height: 64px;
+  --dock-margin: 8px;
+
+  /* Typography */
+  --font-system: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'SF Mono', 'Fira Code', 'JetBrains Mono', 'Cascadia Code', monospace;
+
+  /* Animation */
+  --transition-fast: 120ms ease;
+  --transition-normal: 200ms ease;
+  --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Z-index layers */
+  --z-desktop: 0;
+  --z-desktop-icons: 10;
+  --z-windows: 100;
+  --z-dock: 1000;
+  --z-menubar: 1001;
+  --z-context-menu: 2000;
+  --z-notification: 3000;
+  --z-modal: 4000;
+  --z-boot: 5000;
+}
+
+[data-theme='light'] {
+  --color-bg-desktop: #dce0e8;
+  --color-bg-surface: rgba(239, 241, 245, 0.9);
+  --color-bg-surface-solid: #eff1f5;
+  --color-bg-titlebar: rgba(239, 241, 245, 0.95);
+  --color-bg-titlebar-inactive: rgba(230, 232, 238, 0.9);
+  --color-bg-dock: rgba(239, 241, 245, 0.8);
+  --color-bg-menubar: rgba(230, 232, 238, 0.85);
+  --color-bg-input: rgba(0, 0, 0, 0.04);
+  --color-bg-hover: rgba(0, 0, 0, 0.06);
+  --color-bg-active: rgba(0, 0, 0, 0.1);
+  --color-text-primary: #4c4f69;
+  --color-text-secondary: #6c6f85;
+  --color-text-tertiary: #9ca0b0;
+  --color-text-inverse: #eff1f5;
+  --color-accent: #1e66f5;
+  --color-accent-hover: #2a6ef7;
+  --color-accent-subtle: rgba(30, 102, 245, 0.12);
+  --color-close: #d20f39;
+  --color-minimize: #df8e1d;
+  --color-maximize: #40a02b;
+  --color-traffic-inactive: #bcc0cc;
+  --color-border: rgba(0, 0, 0, 0.08);
+  --color-border-active: rgba(0, 0, 0, 0.15);
+  --shadow-window: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-window-active: 0 12px 48px rgba(0, 0, 0, 0.16), 0 4px 12px rgba(0, 0, 0, 0.1);
+}

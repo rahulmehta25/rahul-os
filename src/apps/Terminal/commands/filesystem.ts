@@ -25,21 +25,31 @@ export function ls(args: string[], ctx: CommandContext): CommandResult {
 
   if (items.length === 0) return { output: [] };
 
+  const isExecutable = (name: string, path: string) =>
+    name.endsWith('.app') || path.startsWith('/usr/local/bin/');
+
   if (showLong) {
     const lines = items.map((item) => {
       const isDir = item.type === 'directory';
-      const perms = isDir ? 'drwxr-xr-x' : '-rw-r--r--';
+      const exec = !isDir && isExecutable(item.name, absPath + '/' + item.name);
+      const perms = isDir ? 'drwxr-xr-x' : exec ? '-rwxr-xr-x' : '-rw-r--r--';
       const size = item.type === 'file' ? String(item.content.length).padStart(6) : '  4096';
       const date = 'Mar 24 08:00';
-      const colorName = isDir ? `\x1b[1;34m${item.name}/\x1b[0m` : item.name;
+      const colorName = isDir
+        ? `\x1b[1;34m${item.name}/\x1b[0m`
+        : exec
+          ? `\x1b[1;32m${item.name}\x1b[0m`
+          : item.name;
       return `${perms}  1 rahul rahul ${size} ${date} ${colorName}`;
     });
     return { output: lines };
   }
 
-  const coloredNames = items.map((item) =>
-    item.type === 'directory' ? `\x1b[1;34m${item.name}/\x1b[0m` : item.name,
-  );
+  const coloredNames = items.map((item) => {
+    if (item.type === 'directory') return `\x1b[1;34m${item.name}/\x1b[0m`;
+    if (isExecutable(item.name, absPath + '/' + item.name)) return `\x1b[1;32m${item.name}\x1b[0m`;
+    return item.name;
+  });
   return { output: [coloredNames.join('  ')] };
 }
 

@@ -41,6 +41,7 @@ export function useDrag({
     const handleUp = (e: PointerEvent) => {
       if (!isDragging.current || !windowRef.current) return;
       isDragging.current = false;
+      try { (e.target as HTMLElement).releasePointerCapture(e.pointerId); } catch { /* already released */ }
 
       const dx = e.clientX - startMouse.current.x;
       const dy = e.clientY - startMouse.current.y;
@@ -68,6 +69,7 @@ export function useDrag({
       isDragging.current = true;
       startMouse.current = { x: e.clientX, y: e.clientY };
       startPos.current = { ...posRef.current };
+      (e.target as HTMLElement).setPointerCapture(e.pointerId);
 
       onDragStart?.();
     },

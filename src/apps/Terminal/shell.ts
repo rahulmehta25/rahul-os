@@ -1,4 +1,5 @@
 import type { FSNode } from '../../stores/filesystemStore';
+import type { EffectType } from '../../stores/effectsStore';
 import { pwd, ls, cd, cat, mkdir, touch, rm, echo } from './commands/filesystem';
 import { whoami, clear, help, neofetch, date, history } from './commands/system';
 import { projects, open, osmoti, fortune, cowsay, matrix, sudoRmRf, exitCmd } from './commands/custom';
@@ -7,6 +8,7 @@ export interface CommandResult {
   output: string[];
   isError?: boolean;
   clear?: boolean;
+  effect?: EffectType;
 }
 
 export interface FilesystemAPI {

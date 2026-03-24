@@ -84,6 +84,7 @@ export function useResize({
     const handleUp = (e: PointerEvent) => {
       if (!isResizing.current || !windowRef.current) return;
       isResizing.current = false;
+      try { (e.target as HTMLElement).releasePointerCapture(e.pointerId); } catch { /* already released */ }
 
       const dx = e.clientX - startMouse.current.x;
       const dy = e.clientY - startMouse.current.y;
@@ -115,6 +116,7 @@ export function useResize({
       startMouse.current = { x: e.clientX, y: e.clientY };
       startPos.current = { ...posRef.current };
       startSize.current = { ...sizeRef.current };
+      (e.target as HTMLElement).setPointerCapture(e.pointerId);
     },
     [enabled, windowRef],
   );

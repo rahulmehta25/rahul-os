@@ -122,38 +122,13 @@ export function cowsay(args: string[], _ctx: CommandContext): CommandResult {
 }
 
 export function matrix(_args: string[], _ctx: CommandContext): CommandResult {
-  const chars = 'ﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍ012345789Z:.="*+-<>¦|';
-  const lines: string[] = ['', '\x1b[1;32m'];
-  for (let i = 0; i < 12; i++) {
-    let line = '  ';
-    for (let j = 0; j < 48; j++) {
-      line += chars[Math.floor(Math.random() * chars.length)];
-    }
-    lines.push(line);
-  }
-  lines.push('\x1b[0m');
-  lines.push('');
-  lines.push('\x1b[1;32m  Wake up, Neo...\x1b[0m');
-  lines.push('  \x1b[1;32mThe Matrix has you...\x1b[0m');
-  lines.push('');
-  return { output: lines };
+  return { output: ['\x1b[1;32mEntering the Matrix...\x1b[0m'], effect: 'matrix' };
 }
 
 export function sudoRmRf(_args: string[], _ctx: CommandContext): CommandResult {
   return {
-    output: [
-      '',
-      '\x1b[1;31m  ⚠ CRITICAL SYSTEM ERROR ⚠\x1b[0m',
-      '',
-      '  Permission denied. Nice try though.',
-      '',
-      '  Did you really think I would let you',
-      '  destroy my portfolio? I spent weeks',
-      '  on this thing.',
-      '',
-      '  \x1b[2m  ...okay it was mostly Claude Code but still.\x1b[0m',
-      '',
-    ],
+    output: ['\x1b[1;31m  rm: destroying filesystem...\x1b[0m'],
+    effect: 'kernelPanic',
   };
 }
 

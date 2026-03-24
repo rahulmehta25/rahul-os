@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useWindowStore } from '../../stores/windowStore.ts';
 
 interface DesktopIcon {
@@ -13,8 +13,14 @@ const icons: DesktopIcon[] = [
     appId: 'terminal',
     label: 'Terminal',
     icon: (
-      <svg viewBox="0 0 32 32" className="w-full h-full">
-        <rect width="32" height="32" rx="7" fill="#1e1e2e" />
+      <svg viewBox="0 0 32 32" width="56" height="56">
+        <defs>
+          <linearGradient id="grad-terminal" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#2a2a3e" />
+            <stop offset="100%" stopColor="#1e1e2e" />
+          </linearGradient>
+        </defs>
+        <rect width="32" height="32" rx="7" fill="url(#grad-terminal)" />
         <path d="M8 22L14 16L8 10" stroke="#a6e3a1" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
         <line x1="16" y1="22" x2="24" y2="22" stroke="#a6e3a1" strokeWidth="2.5" strokeLinecap="round" />
       </svg>
@@ -25,8 +31,14 @@ const icons: DesktopIcon[] = [
     appId: 'filemanager',
     label: 'Files',
     icon: (
-      <svg viewBox="0 0 32 32" className="w-full h-full">
-        <rect width="32" height="32" rx="7" fill="#89b4fa" />
+      <svg viewBox="0 0 32 32" width="56" height="56">
+        <defs>
+          <linearGradient id="grad-files" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#9dc4fc" />
+            <stop offset="100%" stopColor="#89b4fa" />
+          </linearGradient>
+        </defs>
+        <rect width="32" height="32" rx="7" fill="url(#grad-files)" />
         <path d="M6 10C6 8.9 6.9 8 8 8H13L15 11H24C25.1 11 26 11.9 26 13V22C26 23.1 25.1 24 24 24H8C6.9 24 6 23.1 6 22V10Z" fill="white" fillOpacity="0.9" />
       </svg>
     ),
@@ -36,8 +48,14 @@ const icons: DesktopIcon[] = [
     appId: 'settings',
     label: 'Settings',
     icon: (
-      <svg viewBox="0 0 32 32" className="w-full h-full">
-        <rect width="32" height="32" rx="7" fill="#6c7086" />
+      <svg viewBox="0 0 32 32" width="56" height="56">
+        <defs>
+          <linearGradient id="grad-settings" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#7c8096" />
+            <stop offset="100%" stopColor="#6c7086" />
+          </linearGradient>
+        </defs>
+        <rect width="32" height="32" rx="7" fill="url(#grad-settings)" />
         <circle cx="16" cy="16" r="5" stroke="white" strokeWidth="2" fill="none" />
         <g stroke="white" strokeWidth="2" strokeLinecap="round">
           <line x1="16" y1="4" x2="16" y2="8" />
@@ -57,6 +75,7 @@ const icons: DesktopIcon[] = [
 
 export function DesktopIcons() {
   const openWindow = useWindowStore((s) => s.openWindow);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const handleDoubleClick = useCallback(
     (icon: DesktopIcon) => {
@@ -65,50 +84,76 @@ export function DesktopIcons() {
     [openWindow],
   );
 
+  const handleClick = useCallback(
+    (e: React.MouseEvent, appId: string) => {
+      e.stopPropagation();
+      setSelectedId(appId);
+    },
+    [],
+  );
+
+  const handleDesktopClick = useCallback(() => {
+    setSelectedId(null);
+  }, []);
+
   return (
     <div
-      className="absolute grid gap-1 p-4"
+      className="absolute"
       style={{
-        top: 'var(--menubar-height)',
-        left: 0,
+        top: 'calc(var(--menubar-height) + 16px)',
+        left: '16px',
         zIndex: 'var(--z-desktop-icons)',
-        gridTemplateColumns: '80px',
-        gridAutoRows: '80px',
+        display: 'grid',
+        gridTemplateColumns: '90px',
+        gridAutoRows: '90px',
       }}
+      onClick={handleDesktopClick}
     >
-      {icons.map((icon) => (
-        <button
-          key={icon.appId}
-          className="flex flex-col items-center justify-center gap-1 rounded-lg p-1"
-          style={{
-            background: 'transparent',
-            border: 'none',
-            cursor: 'pointer',
-            transition: 'background 120ms',
-          }}
-          onDoubleClick={() => handleDoubleClick(icon)}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'rgba(255,255,255,0.08)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'transparent';
-          }}
-          aria-label={`Open ${icon.label}`}
-        >
-          <div className="w-10 h-10">{icon.icon}</div>
-          <span
+      {icons.map((icon) => {
+        const isSelected = selectedId === icon.appId;
+
+        return (
+          <button
+            key={icon.appId}
+            className="flex flex-col items-center justify-start gap-1.5 rounded-lg"
             style={{
-              fontSize: '11px',
-              color: 'var(--color-text-primary)',
-              fontFamily: 'var(--font-system)',
-              textShadow: '0 1px 3px rgba(0,0,0,0.6)',
-              lineHeight: 1.2,
+              width: '90px',
+              paddingTop: '8px',
+              paddingBottom: '4px',
+              background: isSelected ? 'rgba(137, 180, 250, 0.2)' : 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              transition: 'background 120ms',
+              outline: 'none',
             }}
+            onClick={(e) => handleClick(e, icon.appId)}
+            onDoubleClick={() => handleDoubleClick(icon)}
+            aria-label={`Open ${icon.label}`}
           >
-            {icon.label}
-          </span>
-        </button>
-      ))}
+            <div style={{ width: '56px', height: '56px', flexShrink: 0 }}>
+              {icon.icon}
+            </div>
+            <span
+              style={{
+                fontSize: '11px',
+                color: 'white',
+                fontFamily: 'var(--font-system)',
+                textShadow: '0 1px 3px rgba(0,0,0,0.7), 0 0px 6px rgba(0,0,0,0.4)',
+                lineHeight: 1.2,
+                maxWidth: '76px',
+                textAlign: 'center',
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+                wordBreak: 'break-word',
+              }}
+            >
+              {icon.label}
+            </span>
+          </button>
+        );
+      })}
     </div>
   );
 }

@@ -6,6 +6,9 @@ export interface FSFile {
   content: string;
   createdAt: number;
   modifiedAt: number;
+  icon?: string;
+  opensWith?: string;
+  externalUrl?: string;
 }
 
 export interface FSDirectory {

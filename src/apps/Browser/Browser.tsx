@@ -6,23 +6,27 @@ interface ProjectCard {
   description: string;
   stack: string[];
   color: string;
-  icon: React.ReactNode;
+  gradient: string;
+  featured?: boolean;
 }
 
 const PROJECTS: ProjectCard[] = [
+  {
+    name: 'Portfolio',
+    url: 'https://rahul-mehta.me',
+    description: 'Personal portfolio with project showcases, AI chatbot, and Easter eggs. The traditional way to see my work.',
+    stack: ['React', 'Vercel', 'OpenRouter'],
+    color: '#74c7ec',
+    gradient: 'linear-gradient(135deg, #0c1929 0%, #1a3a5c 30%, #2563eb 70%, #60a5fa 100%)',
+    featured: true,
+  },
   {
     name: 'Osmoti',
     url: 'https://osmoti.com',
     description: 'B2B SaaS platform for ad performance management and optimization. Multi-tenant architecture with AI-powered insights.',
     stack: ['Next.js', 'TypeScript', 'Prisma', 'AWS', 'Anthropic'],
     color: '#89b4fa',
-    icon: (
-      <svg viewBox="0 0 32 32" width="100%" height="100%">
-        <rect width="32" height="32" rx="8" fill="#89b4fa" opacity="0.15" />
-        <circle cx="16" cy="16" r="8" stroke="#89b4fa" strokeWidth="2" fill="none" />
-        <circle cx="16" cy="16" r="3" fill="#89b4fa" />
-      </svg>
-    ),
+    gradient: 'linear-gradient(135deg, #0f1a2e 0%, #1e3a5f 40%, #3b82f6 80%, #93c5fd 100%)',
   },
   {
     name: 'Keep Safe',
@@ -30,14 +34,7 @@ const PROJECTS: ProjectCard[] = [
     description: 'Hotel tech product: smart safe + speaker + charger + AI digital concierge. Secured $100K hotel partnership.',
     stack: ['React', 'Firebase', 'OpenAI', 'RAG'],
     color: '#a6e3a1',
-    icon: (
-      <svg viewBox="0 0 32 32" width="100%" height="100%">
-        <rect width="32" height="32" rx="8" fill="#a6e3a1" opacity="0.15" />
-        <rect x="8" y="10" width="16" height="14" rx="2" stroke="#a6e3a1" strokeWidth="2" fill="none" />
-        <circle cx="16" cy="17" r="2.5" stroke="#a6e3a1" strokeWidth="1.5" fill="none" />
-        <path d="M11 10V8a5 5 0 0 1 10 0v2" stroke="#a6e3a1" strokeWidth="2" fill="none" />
-      </svg>
-    ),
+    gradient: 'linear-gradient(135deg, #0a1f12 0%, #1a4731 40%, #22c55e 80%, #86efac 100%)',
   },
   {
     name: 'Analytics Pro',
@@ -45,14 +42,7 @@ const PROJECTS: ProjectCard[] = [
     description: 'Marketing analytics with AI-powered natural language querying. Ask questions in plain English, get SQL-backed answers.',
     stack: ['FastAPI', 'BigQuery', 'Vertex AI', 'Next.js'],
     color: '#f9e2af',
-    icon: (
-      <svg viewBox="0 0 32 32" width="100%" height="100%">
-        <rect width="32" height="32" rx="8" fill="#f9e2af" opacity="0.15" />
-        <rect x="7" y="18" width="4" height="6" rx="1" fill="#f9e2af" />
-        <rect x="14" y="12" width="4" height="12" rx="1" fill="#f9e2af" />
-        <rect x="21" y="8" width="4" height="16" rx="1" fill="#f9e2af" />
-      </svg>
-    ),
+    gradient: 'linear-gradient(135deg, #1a1505 0%, #4a3a0a 30%, #eab308 70%, #fde68a 100%)',
   },
   {
     name: 'RahulOS',
@@ -60,30 +50,63 @@ const PROJECTS: ProjectCard[] = [
     description: "You're using it right now. A browser-based desktop OS built as a creative portfolio piece.",
     stack: ['React 19', 'Zustand', 'Vite', 'Tailwind 4'],
     color: '#cba6f7',
-    icon: (
-      <svg viewBox="0 0 32 32" width="100%" height="100%">
-        <rect width="32" height="32" rx="8" fill="#cba6f7" opacity="0.15" />
-        <rect x="6" y="6" width="20" height="14" rx="2" stroke="#cba6f7" strokeWidth="2" fill="none" />
-        <line x1="10" y1="24" x2="22" y2="24" stroke="#cba6f7" strokeWidth="2" strokeLinecap="round" />
-        <line x1="16" y1="20" x2="16" y2="24" stroke="#cba6f7" strokeWidth="2" />
-      </svg>
-    ),
-  },
-  {
-    name: 'Portfolio',
-    url: 'https://rahul-mehta.me',
-    description: 'Personal portfolio with project showcases, AI chatbot, and Easter eggs. The traditional way to see my work.',
-    stack: ['React', 'Vercel', 'OpenRouter'],
-    color: '#74c7ec',
-    icon: (
-      <svg viewBox="0 0 32 32" width="100%" height="100%">
-        <rect width="32" height="32" rx="8" fill="#74c7ec" opacity="0.15" />
-        <circle cx="16" cy="12" r="5" stroke="#74c7ec" strokeWidth="2" fill="none" />
-        <path d="M8 26c0-4.4 3.6-8 8-8s8 3.6 8 8" stroke="#74c7ec" strokeWidth="2" fill="none" />
-      </svg>
-    ),
+    gradient: 'linear-gradient(135deg, #1a0f2e 0%, #3b1f6e 40%, #8b5cf6 80%, #c4b5fd 100%)',
   },
 ];
+
+function BrowserChrome({ url, color }: { url: string; color: string }) {
+  return (
+    <div
+      className="flex items-center gap-2 px-3"
+      style={{
+        height: '28px',
+        background: 'rgba(0,0,0,0.5)',
+        borderBottom: `1px solid rgba(255,255,255,0.08)`,
+      }}
+    >
+      <div className="flex items-center gap-1.5">
+        <div className="rounded-full" style={{ width: '7px', height: '7px', background: '#ff5f57' }} />
+        <div className="rounded-full" style={{ width: '7px', height: '7px', background: '#febc2e' }} />
+        <div className="rounded-full" style={{ width: '7px', height: '7px', background: '#28c840' }} />
+      </div>
+      <div
+        className="flex-1 px-2 py-0.5 rounded"
+        style={{
+          background: 'rgba(255,255,255,0.08)',
+          fontSize: '10px',
+          color: `${color}cc`,
+          fontFamily: 'var(--font-mono)',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {url}
+      </div>
+    </div>
+  );
+}
+
+function PreviewContent({ project }: { project: ProjectCard }) {
+  return (
+    <div className="relative" style={{ height: project.featured ? '180px' : '140px', background: project.gradient, overflow: 'hidden' }}>
+      <BrowserChrome url={project.url} color={project.color} />
+      {/* Mock page content */}
+      <div className="p-3" style={{ opacity: 0.6 }}>
+        <div className="rounded" style={{ width: '40%', height: '8px', background: 'rgba(255,255,255,0.3)', marginBottom: '8px' }} />
+        <div className="rounded" style={{ width: '70%', height: '6px', background: 'rgba(255,255,255,0.15)', marginBottom: '5px' }} />
+        <div className="rounded" style={{ width: '55%', height: '6px', background: 'rgba(255,255,255,0.15)', marginBottom: '5px' }} />
+        <div className="rounded" style={{ width: '30%', height: '6px', background: 'rgba(255,255,255,0.15)', marginBottom: '12px' }} />
+        <div className="flex gap-2">
+          <div className="rounded" style={{ width: '50px', height: '20px', background: `${project.color}30`, border: `1px solid ${project.color}40` }} />
+          <div className="rounded" style={{ width: '50px', height: '20px', background: 'rgba(255,255,255,0.06)' }} />
+        </div>
+      </div>
+      {/* Gradient fade at bottom */}
+      <div className="absolute bottom-0 left-0 right-0" style={{ height: '40px', background: 'linear-gradient(transparent, var(--color-bg-surface-solid))' }} />
+    </div>
+  );
+}
 
 export function Browser() {
   const [addressValue, setAddressValue] = useState('');
@@ -105,6 +128,9 @@ export function Browser() {
     window.open(url, '_blank', 'noopener');
   }, []);
 
+  const featured = PROJECTS.filter((p) => p.featured);
+  const regular = PROJECTS.filter((p) => !p.featured);
+
   return (
     <div className="flex flex-col h-full" style={{ fontFamily: 'var(--font-system)' }}>
       {/* Address bar */}
@@ -117,18 +143,9 @@ export function Browser() {
         }}
       >
         <div className="flex items-center gap-1.5 shrink-0">
-          <div
-            className="rounded-full"
-            style={{ width: '8px', height: '8px', background: 'var(--color-close)' }}
-          />
-          <div
-            className="rounded-full"
-            style={{ width: '8px', height: '8px', background: 'var(--color-minimize)' }}
-          />
-          <div
-            className="rounded-full"
-            style={{ width: '8px', height: '8px', background: 'var(--color-maximize)' }}
-          />
+          <div className="rounded-full" style={{ width: '8px', height: '8px', background: 'var(--color-close)' }} />
+          <div className="rounded-full" style={{ width: '8px', height: '8px', background: 'var(--color-minimize)' }} />
+          <div className="rounded-full" style={{ width: '8px', height: '8px', background: 'var(--color-maximize)' }} />
         </div>
 
         <form onSubmit={handleAddressSubmit} className="flex-1">
@@ -151,9 +168,9 @@ export function Browser() {
 
       {/* Bookmarks / Start page */}
       <div className="flex-1 overflow-y-auto p-6">
-        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+        <div style={{ maxWidth: '840px', margin: '0 auto' }}>
           {/* Header */}
-          <div className="mb-8 text-center">
+          <div className="mb-6 text-center">
             <h1
               style={{
                 fontSize: '24px',
@@ -169,70 +186,41 @@ export function Browser() {
             </p>
           </div>
 
-          {/* Project cards */}
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
-              gap: '16px',
-            }}
-          >
-            {PROJECTS.map((project) => (
-              <div
-                key={project.name}
-                className="rounded-xl"
-                style={{
-                  background: 'var(--color-bg-surface-solid)',
-                  border: '1px solid var(--color-border)',
-                  padding: '20px',
-                  transition: 'border-color 150ms, box-shadow 150ms',
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.borderColor = project.color + '40';
-                  (e.currentTarget as HTMLElement).style.boxShadow = `0 4px 20px ${project.color}10`;
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-border)';
-                  (e.currentTarget as HTMLElement).style.boxShadow = 'none';
-                }}
-              >
-                <div className="flex items-start gap-3 mb-3">
-                  <div style={{ width: '40px', height: '40px', flexShrink: 0 }}>{project.icon}</div>
-                  <div className="flex-1 min-w-0">
-                    <h3
-                      style={{
-                        fontSize: '15px',
-                        fontWeight: 600,
-                        color: 'var(--color-text-primary)',
-                        marginBottom: '2px',
-                      }}
-                    >
-                      {project.name}
-                    </h3>
-                    <span
-                      style={{
-                        fontSize: '11px',
-                        color: 'var(--color-text-tertiary)',
-                      }}
-                    >
-                      {project.url.replace('https://', '')}
-                    </span>
-                  </div>
+          {/* Featured project (full width) */}
+          {featured.map((project) => (
+            <div
+              key={project.name}
+              className="rounded-xl overflow-hidden mb-4"
+              style={{
+                background: 'var(--color-bg-surface-solid)',
+                border: '1px solid var(--color-border)',
+                transition: 'border-color 150ms, box-shadow 150ms',
+                cursor: 'pointer',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = project.color + '50';
+                e.currentTarget.style.boxShadow = `0 8px 32px ${project.color}15`;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'var(--color-border)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
+              onClick={() => handleVisit(project.url)}
+            >
+              <PreviewContent project={project} />
+              <div className="p-4">
+                <div className="flex items-center gap-3 mb-2">
+                  <h3 style={{ fontSize: '17px', fontWeight: 600, color: 'var(--color-text-primary)' }}>
+                    {project.name}
+                  </h3>
+                  <span style={{ fontSize: '11px', color: 'var(--color-text-tertiary)', fontFamily: 'var(--font-mono)' }}>
+                    {project.url.replace('https://', '')}
+                  </span>
                 </div>
-
-                <p
-                  style={{
-                    fontSize: '12px',
-                    color: 'var(--color-text-secondary)',
-                    lineHeight: 1.5,
-                    marginBottom: '12px',
-                  }}
-                >
+                <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', lineHeight: 1.5, marginBottom: '12px' }}>
                   {project.description}
                 </p>
-
-                {/* Tech stack badges */}
-                <div className="flex flex-wrap gap-1.5 mb-4">
+                <div className="flex flex-wrap gap-1.5">
                   {project.stack.map((tech) => (
                     <span
                       key={tech}
@@ -249,25 +237,69 @@ export function Browser() {
                     </span>
                   ))}
                 </div>
+              </div>
+            </div>
+          ))}
 
-                {/* Visit button */}
-                <button
-                  className="rounded-lg px-4 py-1.5"
-                  style={{
-                    fontSize: '12px',
-                    fontWeight: 500,
-                    color: 'var(--color-text-inverse)',
-                    background: project.color,
-                    border: 'none',
-                    cursor: 'pointer',
-                    transition: 'opacity 150ms',
-                  }}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.opacity = '0.85'; }}
-                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.opacity = '1'; }}
-                  onClick={() => handleVisit(project.url)}
-                >
-                  Visit →
-                </button>
+          {/* Regular project cards */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
+              gap: '12px',
+            }}
+          >
+            {regular.map((project) => (
+              <div
+                key={project.name}
+                className="rounded-xl overflow-hidden"
+                style={{
+                  background: 'var(--color-bg-surface-solid)',
+                  border: '1px solid var(--color-border)',
+                  transition: 'border-color 150ms, box-shadow 150ms',
+                  cursor: 'pointer',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = project.color + '40';
+                  e.currentTarget.style.boxShadow = `0 4px 20px ${project.color}10`;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--color-border)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+                onClick={() => handleVisit(project.url)}
+              >
+                <PreviewContent project={project} />
+                <div className="p-4">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <h3 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-text-primary)' }}>
+                      {project.name}
+                    </h3>
+                    <span style={{ fontSize: '10px', color: 'var(--color-text-tertiary)', fontFamily: 'var(--font-mono)' }}>
+                      {project.url.replace('https://', '')}
+                    </span>
+                  </div>
+                  <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', lineHeight: 1.5, marginBottom: '10px' }}>
+                    {project.description}
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {project.stack.map((tech) => (
+                      <span
+                        key={tech}
+                        className="px-2 py-0.5 rounded-full"
+                        style={{
+                          fontSize: '10px',
+                          fontWeight: 500,
+                          color: project.color,
+                          background: project.color + '15',
+                          border: `1px solid ${project.color}30`,
+                        }}
+                      >
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               </div>
             ))}
           </div>

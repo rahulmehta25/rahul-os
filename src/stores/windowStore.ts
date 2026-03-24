@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { appRegistry } from '../apps/registry.tsx';
 
 export interface Position {
   x: number;
@@ -61,6 +62,21 @@ export const useWindowStore = create<WindowStore>((set, get) => ({
   activeWindowId: null,
 
   openWindow: (appId, title, options = {}) => {
+    // If allowMultiple is false, focus existing instance instead of opening a new one
+    const manifest = appRegistry[appId];
+    if (manifest && manifest.allowMultiple === false) {
+      const existing = Object.values(get().windows).find((w) => w.appId === appId);
+      if (existing) {
+        // Restore if minimized, then focus
+        if (existing.status === 'minimized') {
+          get().restoreWindow(existing.id);
+        } else {
+          get().focusWindow(existing.id);
+        }
+        return existing.id;
+      }
+    }
+
     const id = `${appId}-${++windowCounter}`;
     const zIndex = get().zIndexCounter + 1;
     const position = options.position ?? cascadeOffset(windowCounter);

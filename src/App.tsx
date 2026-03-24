@@ -4,6 +4,7 @@ import { Desktop } from './components/Desktop/Desktop.tsx';
 import { MobileFallback } from './components/Mobile/MobileFallback.tsx';
 import { BootSequence } from './components/Boot/BootSequence.tsx';
 import { LoginScreen } from './components/Boot/LoginScreen.tsx';
+import { EffectsLayer } from './components/Effects/EffectsLayer.tsx';
 
 function useIsMobile(breakpoint = 768) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < breakpoint);
@@ -45,5 +46,10 @@ export default function App() {
   if (phase === 'boot') return <BootSequence onComplete={handleBootComplete} />;
   if (phase === 'login') return <LoginScreen onLogin={handleLogin} />;
 
-  return <Desktop />;
+  return (
+    <>
+      <Desktop />
+      <EffectsLayer />
+    </>
+  );
 }

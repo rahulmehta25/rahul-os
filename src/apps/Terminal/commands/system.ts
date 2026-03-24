@@ -1,7 +1,7 @@
 import type { CommandContext, CommandResult } from '../shell';
 
 export function whoami(_args: string[], _ctx: CommandContext): CommandResult {
-  return { output: ['rahul'] };
+  return { output: ['Rahul Mehta | Startup Founder & AI/ML Engineer | Georgia Tech CS \'27'] };
 }
 
 export function clear(_args: string[], _ctx: CommandContext): CommandResult {

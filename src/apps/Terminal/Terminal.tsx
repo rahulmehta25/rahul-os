@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useFilesystemStore, initializeFilesystem } from '../../stores/filesystemStore';
 import { useWindowStore } from '../../stores/windowStore';
+import { useEffectsStore } from '../../stores/effectsStore';
 import { defaultFilesystem } from '../../filesystem/defaultFS';
 import { executeCommand } from './shell';
 import type { FilesystemAPI } from './shell';
@@ -85,6 +86,7 @@ export function Terminal({ windowId }: { windowId: string }) {
 
   const fsStore = useFilesystemStore();
   const openWindow = useWindowStore((s) => s.openWindow);
+  const triggerEffect = useEffectsStore((s) => s.triggerEffect);
 
   // Initialize filesystem on first mount
   useEffect(() => {
@@ -164,14 +166,22 @@ export function Terminal({ windowId }: { windowId: string }) {
       return;
     }
 
+    if (result.effect) {
+      triggerEffect(result.effect);
+    }
+
     const outputLines: TerminalLine[] = result.output.map((line) => ({
       id: ++lineCounter,
       content: line,
     }));
 
-    setLines((prev) => [...prev, promptLine, ...outputLines]);
+    const MAX_LINES = 500;
+    setLines((prev) => {
+      const combined = [...prev, promptLine, ...outputLines];
+      return combined.length > MAX_LINES ? combined.slice(combined.length - MAX_LINES) : combined;
+    });
     setInput('');
-  }, [input, cwd, historyList, fsApi, windowId, openWindow]);
+  }, [input, cwd, historyList, fsApi, windowId, openWindow, triggerEffect]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -194,6 +204,38 @@ export function Terminal({ windowId }: { windowId: string }) {
         } else {
           setHistoryIndex(newIndex);
           setInput(historyList[newIndex]);
+        }
+      } else if (e.key === 'Tab') {
+        e.preventDefault();
+        const text = input;
+        const lastSpaceIdx = text.lastIndexOf(' ');
+        const prefix = lastSpaceIdx === -1 ? '' : text.slice(0, lastSpaceIdx + 1);
+        const partial = lastSpaceIdx === -1 ? text : text.slice(lastSpaceIdx + 1);
+        if (!partial) return;
+
+        const resolvedDir = fsApi.resolvePath(
+          partial.includes('/') ? partial.slice(0, partial.lastIndexOf('/') + 1) || '/' : '.',
+          cwd,
+        );
+        const baseName = partial.includes('/') ? partial.slice(partial.lastIndexOf('/') + 1) : partial;
+        const entries = fsApi.listDirectory(resolvedDir);
+        if (!entries) return;
+
+        const matches = entries.filter((e) => e.name.startsWith(baseName));
+        if (matches.length === 1) {
+          const match = matches[0];
+          const dirPrefix = partial.includes('/') ? partial.slice(0, partial.lastIndexOf('/') + 1) : '';
+          const suffix = match.type === 'directory' ? '/' : '';
+          setInput(prefix + dirPrefix + match.name + suffix);
+        } else if (matches.length > 1) {
+          const completionLine: TerminalLine = {
+            id: ++lineCounter,
+            content: matches.map((m) => (m.type === 'directory' ? `\x1b[1;34m${m.name}/\x1b[0m` : m.name)).join('  '),
+          };
+          setLines((prev) => {
+            const combined = [...prev, completionLine];
+            return combined.length > 500 ? combined.slice(combined.length - 500) : combined;
+          });
         }
       } else if (e.key === 'l' && e.ctrlKey) {
         e.preventDefault();

@@ -2,8 +2,8 @@ import type { FSDirectory, FSFile } from '../stores/filesystemStore';
 
 const now = Date.now();
 
-function file(name: string, content: string): FSFile {
-  return { type: 'file', name, content, createdAt: now, modifiedAt: now };
+function file(name: string, content: string, extra?: { icon?: string; opensWith?: string; externalUrl?: string }): FSFile {
+  return { type: 'file', name, content, createdAt: now, modifiedAt: now, ...extra };
 }
 
 function dir(name: string, children: Record<string, FSDirectory | FSFile>): FSDirectory {
@@ -84,6 +84,29 @@ Co-founded with Om Patel. Backed by AWS credits ($10K).`),
     "@anthropic-ai/sdk": "^0.20"
   }
 }`),
+          'architecture.md': file('architecture.md', `# Osmoti Architecture
+
+## System Overview
+Multi-tenant B2B SaaS with organization-scoped data isolation.
+
+## Components
+- **API Layer:** Express.js with Prisma ORM, org-scoped middleware on every query
+- **AI Pipeline:** Dual LLM (Anthropic primary, OpenAI fallback) for ad optimization
+- **Auth:** Supabase Auth with RLS-augmented application-layer isolation
+- **Billing:** Stripe integration with tiered plans (Free, Pro, Enterprise)
+- **Ingestion:** Encrypted token storage for ad platform OAuth connections
+- **CI/CD:** GitHub Actions (lint + typecheck -> unit tests w/ Postgres -> build)
+
+## Data Flow
+1. User connects ad platform (Google/Meta/TikTok) via OAuth
+2. Ingestion service pulls campaign data on schedule
+3. AI pipeline analyzes performance, generates optimization recommendations
+4. Dashboard renders insights with real-time metrics
+
+## Security
+- Prisma middleware enforces org boundaries on every DB query
+- Encrypted token storage for third-party credentials
+- Rate limiting, CORS, Sentry error tracking`),
           'src': dir('src', {
             'index.ts': file('index.ts', `import express from 'express';
 import { setupRoutes } from './routes';
@@ -196,6 +219,27 @@ Building things that ship. Coffee. Not writing cover letters.`),
 - PostHog key needs to be set for Osmoti frontend
 - app.osmoti.com CNAME record pending on Namecheap
 - Analytics Pro needs end-to-end auth flow test on prod`),
+        'about-me.md': file('about-me.md', `# Rahul Mehta
+
+CS student at Georgia Tech (class of '27), startup founder, and full-stack engineer
+who likes building things that actually ship.
+
+I co-founded Osmoti, a B2B SaaS platform for ad performance management, and
+Beach Box Safe Inc., a smart hotel room product that landed a $100K partnership.
+
+I've shipped 15+ projects across web, mobile, AI/ML, and hardware. My stack
+leans TypeScript/React/Node on the frontend and Python/FastAPI on the backend,
+with AWS, GCP, and Supabase for infrastructure.
+
+When I'm not coding, I'm probably drinking coffee, arguing about software
+architecture, or building yet another side project that I'll swear is "the last one."`),
+        'contact.md': file('contact.md', `# Contact
+
+- GitHub:   https://github.com/rahulmehta25
+- LinkedIn: https://linkedin.com/in/rahulmehta25
+- Email:    rahul@osmoti.com
+- Website:  https://rahul-mehta.me
+- Twitter:  https://twitter.com/rahulmehta25`),
       }),
       '.ssh': dir('.ssh', {
         'config': file('config', `Host github.com
@@ -207,6 +251,41 @@ Host osmoti-prod
   HostName ec2-xx-xx-xx-xx.compute-1.amazonaws.com
   User ubuntu
   IdentityFile ~/.ssh/osmoti-key.pem`),
+      }),
+      '.config': dir('.config', {
+        'rahulos.json': file('rahulos.json', `{
+  "theme": "catppuccin-mocha",
+  "dock": { "position": "bottom", "autohide": false, "iconSize": 48 },
+  "terminal": { "fontFamily": "SF Mono", "fontSize": 13, "scrollback": 500 },
+  "wallpaper": "gradient-mocha",
+  "animations": true
+}`),
+      }),
+      Desktop: dir('Desktop', {
+        'welcome.txt': file('welcome.txt', `Welcome to RahulOS!
+
+This is your desktop. You can:
+- Double-click files to open them
+- Drag windows around
+- Use the dock at the bottom to launch apps
+- Open the terminal and type 'help' to explore
+
+Have fun poking around.`),
+        'resume.pdf': file('resume.pdf', 'Open externally to view resume.', {
+          icon: 'document',
+          externalUrl: 'https://rahul-mehta.me/resume',
+        }),
+      }),
+      Games: dir('Games', {
+        'snake.app': file('snake.app', 'Launch Snake game.', {
+          icon: 'game',
+          opensWith: 'snake',
+        }),
+      }),
+      Pictures: dir('Pictures', {
+        wallpapers: dir('wallpapers', {
+          'README.md': file('README.md', 'Wallpaper files go here. Currently using the default gradient.'),
+        }),
       }),
     }),
   }),

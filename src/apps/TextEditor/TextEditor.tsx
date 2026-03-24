@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { EditorView, keymap, lineNumbers, drawSelection, highlightActiveLine } from '@codemirror/view';
-import { EditorState } from '@codemirror/state';
+import { EditorState, Compartment } from '@codemirror/state';
 import { markdown } from '@codemirror/lang-markdown';
 import { defaultHighlightStyle, syntaxHighlighting } from '@codemirror/language';
+import { search, searchKeymap, highlightSelectionMatches } from '@codemirror/search';
 import { useFilesystemStore } from '../../stores/filesystemStore.ts';
 import { useWindowStore } from '../../stores/windowStore.ts';
 
@@ -10,6 +11,8 @@ interface TextEditorProps {
   filePath?: string;
   windowId?: string;
 }
+
+const wrapCompartment = new Compartment();
 
 const darkTheme = EditorView.theme({
   '&': {
@@ -35,6 +38,23 @@ const darkTheme = EditorView.theme({
   '.cm-activeLineGutter': { background: 'var(--color-bg-active)' },
   '.cm-activeLine': { background: 'rgba(255,255,255,0.03)' },
   '.cm-line': { padding: '0 8px' },
+  '.cm-panels': { background: 'var(--color-bg-hover)', color: 'var(--color-text-primary)' },
+  '.cm-panels.cm-panels-top': { borderBottom: '1px solid var(--color-border)' },
+  '.cm-search label': { fontSize: '12px' },
+  '.cm-textfield': {
+    background: 'var(--color-bg-input)',
+    color: 'var(--color-text-primary)',
+    border: '1px solid var(--color-border)',
+    borderRadius: '4px',
+    fontSize: '12px',
+  },
+  '.cm-button': {
+    background: 'var(--color-bg-active)',
+    color: 'var(--color-text-primary)',
+    border: '1px solid var(--color-border)',
+    borderRadius: '4px',
+    fontSize: '12px',
+  },
 });
 
 function renderMarkdown(content: string): string {
@@ -58,6 +78,7 @@ export function TextEditor({ filePath, windowId }: TextEditorProps) {
   const viewRef = useRef<EditorView | null>(null);
   const [isPreview, setIsPreview] = useState(false);
   const [hasUnsaved, setHasUnsaved] = useState(false);
+  const [wordWrap, setWordWrap] = useState(true);
   const contentRef = useRef('');
   const savedContentRef = useRef('');
 
@@ -130,13 +151,16 @@ export function TextEditor({ filePath, windowId }: TextEditorProps) {
         drawSelection(),
         highlightActiveLine(),
         syntaxHighlighting(defaultHighlightStyle),
+        search(),
+        highlightSelectionMatches(),
         ...(isMarkdown ? [markdown()] : []),
         darkTheme,
         keymap.of([
+          ...searchKeymap,
           { key: 'Mod-s', run: () => { handleSave(); return true; } },
         ]),
         updateListener,
-        EditorView.lineWrapping,
+        wrapCompartment.of(wordWrap ? EditorView.lineWrapping : []),
       ],
     });
 
@@ -150,6 +174,16 @@ export function TextEditor({ filePath, windowId }: TextEditorProps) {
     // Only re-init on preview toggle or filePath change
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPreview, filePath]);
+
+  const toggleWordWrap = useCallback(() => {
+    setWordWrap((prev) => {
+      const next = !prev;
+      viewRef.current?.dispatch({
+        effects: wrapCompartment.reconfigure(next ? EditorView.lineWrapping : []),
+      });
+      return next;
+    });
+  }, []);
 
   // No file selected
   if (!filePath) {
@@ -170,43 +204,59 @@ export function TextEditor({ filePath, windowId }: TextEditorProps) {
   return (
     <div className="flex flex-col h-full" style={{ fontFamily: 'var(--font-system)' }}>
       {/* Toolbar */}
-      {showPreviewToggle && (
-        <div
-          className="flex items-center gap-2 px-3 shrink-0"
-          style={{
-            height: '32px',
-            borderBottom: '1px solid var(--color-border)',
-            background: 'var(--color-bg-hover)',
-          }}
-        >
+      <div
+        className="flex items-center gap-2 px-3 shrink-0"
+        style={{
+          height: '32px',
+          borderBottom: '1px solid var(--color-border)',
+          background: 'var(--color-bg-hover)',
+        }}
+      >
+        {showPreviewToggle && (
+          <>
+            <button
+              className="px-2 py-0.5 rounded text-xs"
+              style={{
+                background: !isPreview ? 'var(--color-accent-subtle)' : 'transparent',
+                color: !isPreview ? 'var(--color-accent)' : 'var(--color-text-secondary)',
+                fontWeight: !isPreview ? 500 : 400,
+              }}
+              onClick={() => setIsPreview(false)}
+            >
+              Edit
+            </button>
+            <button
+              className="px-2 py-0.5 rounded text-xs"
+              style={{
+                background: isPreview ? 'var(--color-accent-subtle)' : 'transparent',
+                color: isPreview ? 'var(--color-accent)' : 'var(--color-text-secondary)',
+                fontWeight: isPreview ? 500 : 400,
+              }}
+              onClick={() => setIsPreview(true)}
+            >
+              Preview
+            </button>
+          </>
+        )}
+        {!isPreview && (
           <button
             className="px-2 py-0.5 rounded text-xs"
             style={{
-              background: !isPreview ? 'var(--color-accent-subtle)' : 'transparent',
-              color: !isPreview ? 'var(--color-accent)' : 'var(--color-text-secondary)',
-              fontWeight: !isPreview ? 500 : 400,
+              background: wordWrap ? 'var(--color-accent-subtle)' : 'transparent',
+              color: wordWrap ? 'var(--color-accent)' : 'var(--color-text-secondary)',
+              fontWeight: wordWrap ? 500 : 400,
             }}
-            onClick={() => setIsPreview(false)}
+            onClick={toggleWordWrap}
+            title="Toggle word wrap"
           >
-            Edit
+            Wrap
           </button>
-          <button
-            className="px-2 py-0.5 rounded text-xs"
-            style={{
-              background: isPreview ? 'var(--color-accent-subtle)' : 'transparent',
-              color: isPreview ? 'var(--color-accent)' : 'var(--color-text-secondary)',
-              fontWeight: isPreview ? 500 : 400,
-            }}
-            onClick={() => setIsPreview(true)}
-          >
-            Preview
-          </button>
-          <div className="flex-1" />
-          <span style={{ fontSize: '11px', color: 'var(--color-text-tertiary)' }}>
-            {filePath}
-          </span>
-        </div>
-      )}
+        )}
+        <div className="flex-1" />
+        <span style={{ fontSize: '11px', color: 'var(--color-text-tertiary)' }}>
+          {filePath}
+        </span>
+      </div>
 
       {/* Content */}
       {isPreview ? (

@@ -54,6 +54,12 @@ body,
     opacity var(--transition-fast);
 }
 
+/* Window keyboard focus ring */
+[role="dialog"]:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -2px;
+}
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *,

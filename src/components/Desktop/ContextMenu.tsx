@@ -1,5 +1,7 @@
 import { useEffect, useCallback, useState } from 'react';
 import { useWindowStore } from '../../stores/windowStore.ts';
+import { useFilesystemStore } from '../../stores/filesystemStore.ts';
+import { useModalStore } from '../../stores/modalStore.ts';
 
 interface MenuPosition {
   x: number;
@@ -9,6 +11,9 @@ interface MenuPosition {
 export function ContextMenu() {
   const [position, setPosition] = useState<MenuPosition | null>(null);
   const openWindow = useWindowStore((s) => s.openWindow);
+  const createDirectory = useFilesystemStore((s) => s.createDirectory);
+  const getNode = useFilesystemStore((s) => s.getNode);
+  const openModal = useModalStore((s) => s.openModal);
 
   const handleContextMenu = useCallback((e: MouseEvent) => {
     const target = e.target as HTMLElement;
@@ -41,7 +46,19 @@ export function ContextMenu() {
     {
       label: 'New Folder',
       action: () => {
-        // Placeholder for filesystem integration
+        const desktopPath = '/home/rahul/Desktop';
+        // Ensure the Desktop directory exists
+        if (!getNode(desktopPath)) {
+          createDirectory(desktopPath);
+        }
+        // Find a unique folder name
+        let name = 'Untitled Folder';
+        let counter = 1;
+        while (getNode(`${desktopPath}/${name}`)) {
+          counter++;
+          name = `Untitled Folder ${counter}`;
+        }
+        createDirectory(`${desktopPath}/${name}`);
         handleClose();
       },
     },
@@ -56,10 +73,7 @@ export function ContextMenu() {
     {
       label: 'About RahulOS',
       action: () => {
-        openWindow('about', 'About This Computer', {
-          size: { width: 420, height: 380 },
-          minSize: { width: 360, height: 320 },
-        });
+        openModal('about');
         handleClose();
       },
     },

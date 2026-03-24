@@ -27,6 +27,9 @@ export function TitleBar({
     [onMaximize],
   );
 
+  const trafficLightColor = (activeColor: string) =>
+    isActive || hovered ? activeColor : 'var(--color-traffic-inactive)';
+
   return (
     <div
       className="flex items-center shrink-0 select-none"
@@ -48,12 +51,13 @@ export function TitleBar({
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
+        {/* Close */}
         <button
-          className="w-3 h-3 rounded-full flex items-center justify-center transition-colors"
+          className="rounded-full flex items-center justify-center transition-colors"
           style={{
-            background: isActive || hovered
-              ? 'var(--color-close)'
-              : 'var(--color-traffic-inactive)',
+            width: '14px',
+            height: '14px',
+            background: trafficLightColor('var(--color-close)'),
           }}
           onClick={(e) => {
             e.stopPropagation();
@@ -63,18 +67,24 @@ export function TitleBar({
           aria-label="Close window"
         >
           {hovered && (
-            <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
-              <path d="M1.5 1.5L6.5 6.5M6.5 1.5L1.5 6.5" stroke="rgba(0,0,0,0.5)" strokeWidth="1.2" strokeLinecap="round" />
+            <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
+              <path
+                d="M2 2L7 7M7 2L2 7"
+                stroke="rgba(0,0,0,0.5)"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
             </svg>
           )}
         </button>
 
+        {/* Minimize */}
         <button
-          className="w-3 h-3 rounded-full flex items-center justify-center transition-colors"
+          className="rounded-full flex items-center justify-center transition-colors"
           style={{
-            background: isActive || hovered
-              ? 'var(--color-minimize)'
-              : 'var(--color-traffic-inactive)',
+            width: '14px',
+            height: '14px',
+            background: trafficLightColor('var(--color-minimize)'),
           }}
           onClick={(e) => {
             e.stopPropagation();
@@ -84,18 +94,24 @@ export function TitleBar({
           aria-label="Minimize window"
         >
           {hovered && (
-            <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
-              <path d="M1.5 4H6.5" stroke="rgba(0,0,0,0.5)" strokeWidth="1.2" strokeLinecap="round" />
+            <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
+              <path
+                d="M2 4.5H7"
+                stroke="rgba(0,0,0,0.5)"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
             </svg>
           )}
         </button>
 
+        {/* Maximize — two diagonal arrows */}
         <button
-          className="w-3 h-3 rounded-full flex items-center justify-center transition-colors"
+          className="rounded-full flex items-center justify-center transition-colors"
           style={{
-            background: isActive || hovered
-              ? 'var(--color-maximize)'
-              : 'var(--color-traffic-inactive)',
+            width: '14px',
+            height: '14px',
+            background: trafficLightColor('var(--color-maximize)'),
           }}
           onClick={(e) => {
             e.stopPropagation();
@@ -105,8 +121,35 @@ export function TitleBar({
           aria-label="Maximize window"
         >
           {hovered && (
-            <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
-              <path d="M1.5 2.5L4 0.5L6.5 2.5M1.5 5.5L4 7.5L6.5 5.5" stroke="rgba(0,0,0,0.5)" strokeWidth="1.0" strokeLinecap="round" strokeLinejoin="round" />
+            <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
+              {/* Arrow pointing top-left */}
+              <path
+                d="M1.5 3.5V1.5H3.5"
+                stroke="rgba(0,0,0,0.5)"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M1.5 1.5L4 4"
+                stroke="rgba(0,0,0,0.5)"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
+              {/* Arrow pointing bottom-right */}
+              <path
+                d="M7.5 5.5V7.5H5.5"
+                stroke="rgba(0,0,0,0.5)"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M7.5 7.5L5 5"
+                stroke="rgba(0,0,0,0.5)"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
             </svg>
           )}
         </button>
@@ -114,12 +157,12 @@ export function TitleBar({
 
       {/* Title */}
       <div
-        className="flex-1 text-center truncate text-xs font-medium pointer-events-none"
+        className="flex-1 text-center truncate text-sm font-medium pointer-events-none"
         style={{
           color: isActive
             ? 'var(--color-text-primary)'
             : 'var(--color-text-tertiary)',
-          paddingRight: '68px',
+          marginRight: '72px',
         }}
       >
         {title}

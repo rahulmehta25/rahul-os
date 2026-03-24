@@ -2,13 +2,16 @@ import { Suspense, useEffect, useRef } from 'react';
 import { useWindowStore } from '../../stores/windowStore.ts';
 import { useSettingsStore } from '../../stores/settingsStore.ts';
 import { useNotificationStore } from '../../stores/notificationStore.ts';
+import { useModalStore } from '../../stores/modalStore.ts';
 import { Window } from '../Window/Window.tsx';
 import { MenuBar } from './MenuBar.tsx';
 import { Dock } from './Dock.tsx';
 import { DesktopIcons } from './DesktopIcons.tsx';
 import { ContextMenu } from './ContextMenu.tsx';
 import { NotificationCenter } from '../Notifications/NotificationCenter.tsx';
+import { AboutModal } from '../../apps/AboutThisComputer/About.tsx';
 import { appRegistry } from '../../apps/registry.tsx';
+import { useWindowKeyboard } from '../../hooks/useWindowKeyboard.ts';
 
 function AppLoader({ appId, windowId, appProps }: { appId: string; windowId: string; appProps?: Record<string, unknown> }) {
   const manifest = appRegistry[appId];
@@ -60,8 +63,11 @@ export function Desktop() {
   const wallpaper = useSettingsStore((s) => s.wallpaper);
   const windows = useWindowStore((s) => s.windows);
   const push = useNotificationStore((s) => s.push);
+  const activeModal = useModalStore((s) => s.activeModal);
   const notifsFired = useRef(false);
   const terminalHintFired = useRef(false);
+
+  useWindowKeyboard();
 
   useEffect(() => {
     if (notifsFired.current) return;
@@ -129,6 +135,8 @@ export function Desktop() {
       <ContextMenu />
 
       <NotificationCenter />
+
+      {activeModal === 'about' && <AboutModal />}
     </div>
   );
 }

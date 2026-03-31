@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import type { FSNode } from '../../stores/filesystemStore.ts';
 
 interface FileGridProps {
@@ -11,103 +11,142 @@ interface FileGridProps {
   onContextMenu: (e: React.MouseEvent, node: FSNode) => void;
 }
 
-function getFileIcon(node: FSNode): { icon: React.ReactNode; color: string } {
+type SortColumn = 'name' | 'modified' | 'size' | 'kind';
+type SortDirection = 'asc' | 'desc';
+
+function getFileIcon(node: FSNode): React.ReactNode {
   if (node.type === 'directory') {
-    return {
-      color: '#89b4fa',
-      icon: (
-        <svg viewBox="0 0 32 32" width="100%" height="100%">
-          <path
-            d="M3 8C3 6.34 4.34 5 6 5H12L15 9H26C27.66 9 29 10.34 29 12V24C29 25.66 27.66 27 26 27H6C4.34 27 3 25.66 3 24V8Z"
-            fill="currentColor"
-          />
-        </svg>
-      ),
-    };
+    return (
+      <svg viewBox="0 0 64 52" width="100%" height="100%">
+        <path
+          d="M4 10C4 6.7 6.7 4 10 4H24L29 12H54C57.3 12 60 14.7 60 18V42C60 45.3 57.3 48 54 48H10C6.7 48 4 45.3 4 42V10Z"
+          fill="#4FACE9"
+        />
+        <path
+          d="M4 18H60V42C60 45.3 57.3 48 54 48H10C6.7 48 4 45.3 4 42V18Z"
+          fill="#3D99DB"
+        />
+        <rect x="4" y="18" width="56" height="2" rx="1" fill="rgba(255,255,255,0.12)" />
+      </svg>
+    );
   }
 
   const ext = node.name.split('.').pop()?.toLowerCase() ?? '';
+
   switch (ext) {
     case 'md':
-      return {
-        color: '#a6e3a1',
-        icon: (
-          <svg viewBox="0 0 32 32" width="100%" height="100%">
-            <rect x="4" y="2" width="24" height="28" rx="3" fill="currentColor" opacity="0.15" />
-            <rect x="4" y="2" width="24" height="28" rx="3" stroke="currentColor" strokeWidth="1.5" fill="none" />
-            <text x="16" y="20" textAnchor="middle" fill="currentColor" fontSize="10" fontWeight="700">M↓</text>
-          </svg>
-        ),
-      };
+      return (
+        <svg viewBox="0 0 52 64" width="100%" height="100%">
+          <path d="M6 4h28l12 12v40c0 2.2-1.8 4-4 4H10c-2.2 0-4-1.8-4-4V8c0-2.2 1.8-4 4-4z" fill="#E8E8ED" />
+          <path d="M34 4v12h12L34 4z" fill="#C7C7CC" />
+          <rect x="12" y="30" width="28" height="24" rx="3" fill="#34C759" />
+          <text x="26" y="47" textAnchor="middle" fill="white" fontSize="11" fontWeight="700" fontFamily="system-ui">MD</text>
+        </svg>
+      );
     case 'txt':
-      return {
-        color: '#cdd6f4',
-        icon: (
-          <svg viewBox="0 0 32 32" width="100%" height="100%">
-            <rect x="4" y="2" width="24" height="28" rx="3" fill="currentColor" opacity="0.15" />
-            <rect x="4" y="2" width="24" height="28" rx="3" stroke="currentColor" strokeWidth="1.5" fill="none" />
-            <line x1="9" y1="10" x2="23" y2="10" stroke="currentColor" strokeWidth="1.5" />
-            <line x1="9" y1="15" x2="21" y2="15" stroke="currentColor" strokeWidth="1.5" />
-            <line x1="9" y1="20" x2="18" y2="20" stroke="currentColor" strokeWidth="1.5" />
-          </svg>
-        ),
-      };
+      return (
+        <svg viewBox="0 0 52 64" width="100%" height="100%">
+          <path d="M6 4h28l12 12v40c0 2.2-1.8 4-4 4H10c-2.2 0-4-1.8-4-4V8c0-2.2 1.8-4 4-4z" fill="#E8E8ED" />
+          <path d="M34 4v12h12L34 4z" fill="#C7C7CC" />
+          <line x1="14" y1="32" x2="38" y2="32" stroke="#8E8E93" strokeWidth="2" strokeLinecap="round" />
+          <line x1="14" y1="39" x2="34" y2="39" stroke="#8E8E93" strokeWidth="2" strokeLinecap="round" />
+          <line x1="14" y1="46" x2="28" y2="46" stroke="#8E8E93" strokeWidth="2" strokeLinecap="round" />
+        </svg>
+      );
     case 'pdf':
-      return {
-        color: '#f38ba8',
-        icon: (
-          <svg viewBox="0 0 32 32" width="100%" height="100%">
-            <rect x="4" y="2" width="24" height="28" rx="3" fill="currentColor" opacity="0.15" />
-            <rect x="4" y="2" width="24" height="28" rx="3" stroke="currentColor" strokeWidth="1.5" fill="none" />
-            <text x="16" y="20" textAnchor="middle" fill="currentColor" fontSize="9" fontWeight="700">PDF</text>
-          </svg>
-        ),
-      };
+      return (
+        <svg viewBox="0 0 52 64" width="100%" height="100%">
+          <path d="M6 4h28l12 12v40c0 2.2-1.8 4-4 4H10c-2.2 0-4-1.8-4-4V8c0-2.2 1.8-4 4-4z" fill="#E8E8ED" />
+          <path d="M34 4v12h12L34 4z" fill="#C7C7CC" />
+          <rect x="12" y="30" width="28" height="24" rx="3" fill="#FF3B30" />
+          <text x="26" y="47" textAnchor="middle" fill="white" fontSize="10" fontWeight="700" fontFamily="system-ui">PDF</text>
+        </svg>
+      );
     case 'url':
-      return {
-        color: '#74c7ec',
-        icon: (
-          <svg viewBox="0 0 32 32" width="100%" height="100%">
-            <circle cx="16" cy="16" r="12" fill="currentColor" opacity="0.15" />
-            <circle cx="16" cy="16" r="12" stroke="currentColor" strokeWidth="1.5" fill="none" />
-            <path d="M10 16C10 12 12.5 8 16 8C19.5 8 22 12 22 16C22 20 19.5 24 16 24C12.5 24 10 20 10 16Z" stroke="currentColor" strokeWidth="1" fill="none" />
-            <line x1="4" y1="16" x2="28" y2="16" stroke="currentColor" strokeWidth="1" />
-          </svg>
-        ),
-      };
+      return (
+        <svg viewBox="0 0 64 64" width="100%" height="100%">
+          <circle cx="32" cy="32" r="26" fill="#5AC8FA" />
+          <ellipse cx="32" cy="32" rx="12" ry="26" fill="none" stroke="white" strokeWidth="1.5" opacity="0.6" />
+          <line x1="6" y1="32" x2="58" y2="32" stroke="white" strokeWidth="1.5" opacity="0.6" />
+          <line x1="6" y1="22" x2="58" y2="22" stroke="white" strokeWidth="1" opacity="0.3" />
+          <line x1="6" y1="42" x2="58" y2="42" stroke="white" strokeWidth="1" opacity="0.3" />
+        </svg>
+      );
     case 'app':
-      return {
-        color: '#cba6f7',
-        icon: (
-          <svg viewBox="0 0 32 32" width="100%" height="100%">
-            <rect x="4" y="4" width="24" height="24" rx="6" fill="currentColor" opacity="0.2" />
-            <rect x="4" y="4" width="24" height="24" rx="6" stroke="currentColor" strokeWidth="1.5" fill="none" />
-            <polygon points="13,10 13,22 23,16" fill="currentColor" />
-          </svg>
-        ),
-      };
+      return (
+        <svg viewBox="0 0 64 64" width="100%" height="100%">
+          <rect x="4" y="4" width="56" height="56" rx="14" fill="#AF52DE" />
+          <polygon points="26,18 26,46 46,32" fill="white" />
+        </svg>
+      );
     case 'json':
-      return {
-        color: '#f9e2af',
-        icon: (
-          <svg viewBox="0 0 32 32" width="100%" height="100%">
-            <rect x="4" y="2" width="24" height="28" rx="3" fill="currentColor" opacity="0.15" />
-            <rect x="4" y="2" width="24" height="28" rx="3" stroke="currentColor" strokeWidth="1.5" fill="none" />
-            <text x="16" y="20" textAnchor="middle" fill="currentColor" fontSize="8" fontWeight="600">{ }</text>
-          </svg>
-        ),
-      };
+      return (
+        <svg viewBox="0 0 52 64" width="100%" height="100%">
+          <path d="M6 4h28l12 12v40c0 2.2-1.8 4-4 4H10c-2.2 0-4-1.8-4-4V8c0-2.2 1.8-4 4-4z" fill="#E8E8ED" />
+          <path d="M34 4v12h12L34 4z" fill="#C7C7CC" />
+          <rect x="12" y="30" width="28" height="24" rx="3" fill="#FF9500" />
+          <text x="26" y="47" textAnchor="middle" fill="white" fontSize="12" fontWeight="700" fontFamily="system-ui">&#123; &#125;</text>
+        </svg>
+      );
+    case 'ts':
+    case 'tsx':
+      return (
+        <svg viewBox="0 0 52 64" width="100%" height="100%">
+          <path d="M6 4h28l12 12v40c0 2.2-1.8 4-4 4H10c-2.2 0-4-1.8-4-4V8c0-2.2 1.8-4 4-4z" fill="#E8E8ED" />
+          <path d="M34 4v12h12L34 4z" fill="#C7C7CC" />
+          <rect x="12" y="30" width="28" height="24" rx="3" fill="#3178C6" />
+          <text x="26" y="47" textAnchor="middle" fill="white" fontSize="11" fontWeight="700" fontFamily="system-ui">TS</text>
+        </svg>
+      );
+    case 'js':
+    case 'jsx':
+      return (
+        <svg viewBox="0 0 52 64" width="100%" height="100%">
+          <path d="M6 4h28l12 12v40c0 2.2-1.8 4-4 4H10c-2.2 0-4-1.8-4-4V8c0-2.2 1.8-4 4-4z" fill="#E8E8ED" />
+          <path d="M34 4v12h12L34 4z" fill="#C7C7CC" />
+          <rect x="12" y="30" width="28" height="24" rx="3" fill="#F7DF1E" />
+          <text x="26" y="47" textAnchor="middle" fill="#333" fontSize="11" fontWeight="700" fontFamily="system-ui">JS</text>
+        </svg>
+      );
     default:
-      return {
-        color: '#a6adc8',
-        icon: (
-          <svg viewBox="0 0 32 32" width="100%" height="100%">
-            <rect x="4" y="2" width="24" height="28" rx="3" fill="currentColor" opacity="0.15" />
-            <rect x="4" y="2" width="24" height="28" rx="3" stroke="currentColor" strokeWidth="1.5" fill="none" />
-          </svg>
-        ),
-      };
+      return (
+        <svg viewBox="0 0 52 64" width="100%" height="100%">
+          <path d="M6 4h28l12 12v40c0 2.2-1.8 4-4 4H10c-2.2 0-4-1.8-4-4V8c0-2.2 1.8-4 4-4z" fill="#E8E8ED" />
+          <path d="M34 4v12h12L34 4z" fill="#C7C7CC" />
+        </svg>
+      );
   }
+}
+
+function getKind(node: FSNode): string {
+  if (node.type === 'directory') return 'Folder';
+  const ext = node.name.split('.').pop()?.toLowerCase() ?? '';
+  switch (ext) {
+    case 'md': return 'Markdown';
+    case 'txt': return 'Plain Text';
+    case 'json': return 'JSON';
+    case 'pdf': return 'PDF Document';
+    case 'url': return 'Web Shortcut';
+    case 'app': return 'Application';
+    case 'ts': case 'tsx': return 'TypeScript';
+    case 'js': case 'jsx': return 'JavaScript';
+    default: return 'Document';
+  }
+}
+
+function formatSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function formatDate(timestamp: number): string {
+  const d = new Date(timestamp);
+  const now = new Date();
+  if (d.toDateString() === now.toDateString()) {
+    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+  return d.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
 function GridItem({
@@ -123,23 +162,35 @@ function GridItem({
   onOpen: () => void;
   onContextMenu: (e: React.MouseEvent) => void;
 }) {
-  const { icon, color } = getFileIcon(node);
+  const [pulsing, setPulsing] = useState(false);
+
+  const handleDoubleClick = useCallback(() => {
+    setPulsing(true);
+    setTimeout(() => {
+      setPulsing(false);
+      onOpen();
+    }, 150);
+  }, [onOpen]);
 
   return (
     <button
-      className="flex flex-col items-center gap-1 p-2 rounded-lg"
+      data-file-item
+      className="flex flex-col items-center gap-1 rounded-lg"
       style={{
-        width: '88px',
-        background: isSelected ? 'var(--color-accent-subtle)' : 'transparent',
-        border: isSelected ? '1px solid var(--color-accent)' : '1px solid transparent',
+        width: '96px',
+        padding: '8px 4px 6px',
+        background: isSelected ? 'rgba(10, 132, 255, 0.12)' : 'transparent',
+        border: isSelected ? '1px solid rgba(10, 132, 255, 0.25)' : '1px solid transparent',
+        borderRadius: '8px',
         cursor: 'default',
-        transition: 'background 100ms',
+        transition: 'background 100ms, transform 100ms ease-out',
+        transform: pulsing ? 'scale(1.05)' : 'scale(1)',
       }}
       onClick={onSelect}
-      onDoubleClick={onOpen}
+      onDoubleClick={handleDoubleClick}
       onContextMenu={onContextMenu}
     >
-      <div style={{ width: '40px', height: '40px', color }}>{icon}</div>
+      <div style={{ width: '64px', height: '64px' }}>{getFileIcon(node)}</div>
       <span
         className="text-center leading-tight"
         style={{
@@ -150,7 +201,7 @@ function GridItem({
           WebkitLineClamp: 2,
           WebkitBoxOrient: 'vertical',
           overflow: 'hidden',
-          maxWidth: '80px',
+          maxWidth: '88px',
         }}
       >
         {node.name}
@@ -159,59 +210,84 @@ function GridItem({
   );
 }
 
-function ListItem({
+function ListRow({
   node,
   isSelected,
+  isEven,
   onSelect,
   onOpen,
   onContextMenu,
 }: {
   node: FSNode;
   isSelected: boolean;
+  isEven: boolean;
   onSelect: () => void;
   onOpen: () => void;
   onContextMenu: (e: React.MouseEvent) => void;
 }) {
-  const { icon, color } = getFileIcon(node);
-  const modified = node.type === 'file' ? new Date(node.modifiedAt).toLocaleDateString() : '';
+  const modified = node.type === 'file' ? formatDate(node.modifiedAt) : '--';
   const size = node.type === 'file' ? formatSize(node.content.length) : '--';
+  const kind = getKind(node);
 
   return (
     <button
-      className="flex items-center gap-3 w-full text-left px-3 py-1.5 rounded"
+      data-file-item
+      className="flex items-center gap-3 w-full text-left px-3"
       style={{
-        background: isSelected ? 'var(--color-accent-subtle)' : 'transparent',
+        height: '24px',
+        background: isSelected
+          ? 'var(--color-accent)'
+          : isEven
+            ? 'var(--color-bg-input)'
+            : 'transparent',
+        color: isSelected ? '#fff' : 'var(--color-text-primary)',
         cursor: 'default',
-        transition: 'background 100ms',
+        transition: 'background 80ms',
+        borderRadius: isSelected ? '4px' : '0',
       }}
       onClick={onSelect}
       onDoubleClick={onOpen}
       onContextMenu={onContextMenu}
     >
-      <div style={{ width: '18px', height: '18px', color, flexShrink: 0 }}>{icon}</div>
-      <span
-        className="flex-1 truncate"
-        style={{ fontSize: '12px', color: 'var(--color-text-primary)' }}
-      >
+      <div style={{ width: '18px', height: '18px', flexShrink: 0 }}>{getFileIcon(node)}</div>
+      <span className="flex-1 truncate" style={{ fontSize: '12px' }}>
         {node.name}
       </span>
       <span
-        style={{ fontSize: '11px', color: 'var(--color-text-tertiary)', width: '80px', textAlign: 'right' }}
+        style={{
+          fontSize: '11px',
+          color: isSelected ? 'rgba(255,255,255,0.7)' : 'var(--color-text-tertiary)',
+          width: '120px',
+          textAlign: 'right',
+          flexShrink: 0,
+        }}
       >
         {modified}
       </span>
       <span
-        style={{ fontSize: '11px', color: 'var(--color-text-tertiary)', width: '60px', textAlign: 'right' }}
+        style={{
+          fontSize: '11px',
+          color: isSelected ? 'rgba(255,255,255,0.7)' : 'var(--color-text-tertiary)',
+          width: '70px',
+          textAlign: 'right',
+          flexShrink: 0,
+        }}
       >
         {size}
       </span>
+      <span
+        style={{
+          fontSize: '11px',
+          color: isSelected ? 'rgba(255,255,255,0.7)' : 'var(--color-text-tertiary)',
+          width: '100px',
+          textAlign: 'right',
+          flexShrink: 0,
+        }}
+      >
+        {kind}
+      </span>
     </button>
   );
-}
-
-function formatSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  return `${(bytes / 1024).toFixed(1)} KB`;
 }
 
 export function FileGrid({
@@ -223,19 +299,58 @@ export function FileGrid({
   onOpen,
   onContextMenu,
 }: FileGridProps) {
-  const handleBgClick = useCallback(() => {
-    onSelect('');
-  }, [onSelect]);
+  const [sortBy, setSortBy] = useState<SortColumn>('name');
+  const [sortDir, setSortDir] = useState<SortDirection>('asc');
+
+  void currentPath;
+
+  const handleSort = useCallback((col: SortColumn) => {
+    setSortBy((prev) => {
+      if (prev === col) {
+        setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+        return prev;
+      }
+      setSortDir('asc');
+      return col;
+    });
+  }, []);
+
+  const sortedItems = useMemo(() => {
+    if (viewMode !== 'list') return items;
+    return [...items].sort((a, b) => {
+      if (a.type !== b.type) return a.type === 'directory' ? -1 : 1;
+      let cmp = 0;
+      switch (sortBy) {
+        case 'name':
+          cmp = a.name.localeCompare(b.name);
+          break;
+        case 'modified': {
+          const at = a.type === 'file' ? a.modifiedAt : a.createdAt;
+          const bt = b.type === 'file' ? b.modifiedAt : b.createdAt;
+          cmp = at - bt;
+          break;
+        }
+        case 'size': {
+          const as2 = a.type === 'file' ? a.content.length : 0;
+          const bs2 = b.type === 'file' ? b.content.length : 0;
+          cmp = as2 - bs2;
+          break;
+        }
+        case 'kind':
+          cmp = getKind(a).localeCompare(getKind(b));
+          break;
+      }
+      return sortDir === 'asc' ? cmp : -cmp;
+    });
+  }, [items, viewMode, sortBy, sortDir]);
+
+  const handleBgClick = useCallback(() => onSelect(''), [onSelect]);
 
   if (items.length === 0) {
     return (
       <div
         className="flex-1 flex items-center justify-center"
-        style={{
-          color: 'var(--color-text-tertiary)',
-          fontFamily: 'var(--font-system)',
-          fontSize: '13px',
-        }}
+        style={{ color: 'var(--color-text-tertiary)', fontSize: '13px' }}
         onClick={handleBgClick}
       >
         This folder is empty
@@ -243,28 +358,69 @@ export function FileGrid({
     );
   }
 
-  // Suppress unused warning - currentPath is used by parent for context
-  void currentPath;
-
   if (viewMode === 'list') {
+    const columns: { key: SortColumn; label: string; width?: string }[] = [
+      { key: 'name', label: 'Name' },
+      { key: 'modified', label: 'Date Modified', width: '120px' },
+      { key: 'size', label: 'Size', width: '70px' },
+      { key: 'kind', label: 'Kind', width: '100px' },
+    ];
+
     return (
-      <div className="flex-1 overflow-y-auto p-2" onClick={handleBgClick}>
-        <div className="flex items-center gap-3 px-3 py-1 mb-1" style={{ fontSize: '10px', color: 'var(--color-text-tertiary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-          <span style={{ width: '18px' }} />
-          <span className="flex-1">Name</span>
-          <span style={{ width: '80px', textAlign: 'right' }}>Modified</span>
-          <span style={{ width: '60px', textAlign: 'right' }}>Size</span>
+      <div className="flex-1 flex flex-col overflow-hidden" onClick={handleBgClick}>
+        <div
+          className="flex items-center gap-3 px-3 shrink-0"
+          style={{
+            height: '22px',
+            borderBottom: '1px solid var(--color-border)',
+            fontSize: '11px',
+            color: 'var(--color-text-tertiary)',
+            fontWeight: 500,
+            userSelect: 'none',
+          }}
+        >
+          <span style={{ width: '18px', flexShrink: 0 }} />
+          {columns.map((col) => (
+            <button
+              key={col.key}
+              className="flex items-center gap-1"
+              style={{
+                ...(col.key === 'name'
+                  ? { flex: 1, justifyContent: 'flex-start' }
+                  : { width: col.width, justifyContent: 'flex-end', flexShrink: 0 }),
+                background: 'transparent',
+                color: sortBy === col.key ? 'var(--color-text-secondary)' : 'var(--color-text-tertiary)',
+                fontSize: '11px',
+                fontWeight: 500,
+                cursor: 'pointer',
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleSort(col.key);
+              }}
+            >
+              {col.label}
+              {sortBy === col.key && (
+                <span style={{ fontSize: '8px', marginLeft: '2px' }}>
+                  {sortDir === 'asc' ? '\u25B2' : '\u25BC'}
+                </span>
+              )}
+            </button>
+          ))}
         </div>
-        {items.map((node) => (
-          <ListItem
-            key={node.name}
-            node={node}
-            isSelected={selectedName === node.name}
-            onSelect={() => onSelect(node.name)}
-            onOpen={() => onOpen(node)}
-            onContextMenu={(e) => onContextMenu(e, node)}
-          />
-        ))}
+        <div className="flex-1 overflow-y-auto py-1">
+          {sortedItems.map((node, i) => (
+            <ListRow
+              key={node.name}
+              node={node}
+              isSelected={selectedName === node.name}
+              isEven={i % 2 === 0}
+              onSelect={() => onSelect(node.name)}
+              onOpen={() => onOpen(node)}
+              onContextMenu={(e) => onContextMenu(e, node)}
+            />
+          ))}
+        </div>
       </div>
     );
   }
@@ -272,7 +428,7 @@ export function FileGrid({
   return (
     <div
       className="flex-1 overflow-y-auto p-3"
-      style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', alignContent: 'flex-start' }}
+      style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignContent: 'flex-start' }}
       onClick={handleBgClick}
     >
       {items.map((node) => (

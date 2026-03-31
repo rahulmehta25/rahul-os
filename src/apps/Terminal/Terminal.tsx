@@ -23,10 +23,10 @@ function parseAnsi(text: string): React.ReactNode[] {
   let match: RegExpExecArray | null;
 
   const colorMap: Record<string, string> = {
-    '30': '#45475a', '31': '#f38ba8', '32': '#a6e3a1', '33': '#f9e2af',
-    '34': '#89b4fa', '35': '#cba6f7', '36': '#94e2d5', '37': '#cdd6f4',
-    '40': '#45475a', '41': '#f38ba8', '42': '#a6e3a1', '43': '#f9e2af',
-    '44': '#89b4fa', '45': '#cba6f7', '46': '#94e2d5', '47': '#bac2de',
+    '30': '#3a3a3c', '31': '#FF453A', '32': '#32D74B', '33': '#FFD60A',
+    '34': '#0A84FF', '35': '#BF5AF2', '36': '#64D2FF', '37': '#f5f5f7',
+    '40': '#3a3a3c', '41': '#FF453A', '42': '#32D74B', '43': '#FFD60A',
+    '44': '#0A84FF', '45': '#BF5AF2', '46': '#64D2FF', '47': '#d1d1d6',
   };
 
   while ((match = regex.exec(text)) !== null) {
@@ -72,7 +72,7 @@ function parseAnsi(text: string): React.ReactNode[] {
 
 function promptPrefix(cwd: string): string {
   const display = cwd.replace('/home/rahul', '~');
-  return `rahul@rahulos:${display}$ `;
+  return `\x1b[1;32mrahul@rahulos\x1b[0m\x1b[37m:\x1b[0m\x1b[1;34m${display}\x1b[0m\x1b[37m$ \x1b[0m`;
 }
 
 export function Terminal({ windowId }: { windowId: string }) {
@@ -88,7 +88,6 @@ export function Terminal({ windowId }: { windowId: string }) {
   const openWindow = useWindowStore((s) => s.openWindow);
   const triggerEffect = useEffectsStore((s) => s.triggerEffect);
 
-  // Initialize filesystem on first mount
   useEffect(() => {
     if (!fsInitialized) {
       initializeFilesystem(defaultFilesystem);
@@ -96,7 +95,6 @@ export function Terminal({ windowId }: { windowId: string }) {
     }
   }, []);
 
-  // Show MOTD on mount
   useEffect(() => {
     const motd = fsStore.getNode('/etc/motd');
     const welcomeLines: TerminalLine[] = [];
@@ -110,7 +108,6 @@ export function Terminal({ windowId }: { windowId: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Auto-scroll on new lines
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -142,7 +139,6 @@ export function Terminal({ windowId }: { windowId: string }) {
       return;
     }
 
-    // Add to history
     setHistoryList((prev) => [...prev, trimmed]);
     setHistoryIndex(-1);
 
@@ -150,7 +146,6 @@ export function Terminal({ windowId }: { windowId: string }) {
       cwd,
       setCwd: (newCwd: string) => {
         setCwd(newCwd);
-        // Update window title with new path
         useWindowStore.getState().setTitle(windowId, `Terminal — ${newCwd.replace('/home/rahul', '~')}`);
       },
       fs: fsApi,
@@ -258,7 +253,7 @@ export function Terminal({ windowId }: { windowId: string }) {
     inputRef.current?.focus();
   }, []);
 
-  const prompt = promptPrefix(cwd);
+  const displayCwd = cwd.replace('/home/rahul', '~');
 
   return (
     <div
@@ -266,11 +261,11 @@ export function Terminal({ windowId }: { windowId: string }) {
       style={{
         width: '100%',
         height: '100%',
-        backgroundColor: '#11111b',
+        backgroundColor: '#1e1e1e',
         fontFamily: 'var(--font-mono)',
         fontSize: '13px',
         lineHeight: '1.5',
-        color: '#cdd6f4',
+        color: '#CCCCCC',
         display: 'flex',
         flexDirection: 'column',
         cursor: 'text',
@@ -281,23 +276,45 @@ export function Terminal({ windowId }: { windowId: string }) {
         style={{
           flex: 1,
           overflowY: 'auto',
-          padding: '8px 12px',
+          padding: '12px',
           minHeight: 0,
         }}
       >
         {lines.map((line) => (
-          <div key={line.id} style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all', minHeight: '1.5em' }}>
+          <div key={line.id} style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all', minHeight: '1.5em', ...(line.isPrompt ? { marginTop: '8px' } : {}) }}>
             {parseAnsi(line.content)}
           </div>
         ))}
 
         {/* Active input line */}
-        <div style={{ display: 'flex', whiteSpace: 'pre' }}>
-          <span style={{ color: '#a6e3a1', fontWeight: 'bold' }}>
-            {prompt.split('$')[0]}$
+        <div style={{ display: 'flex', whiteSpace: 'pre', alignItems: 'baseline', marginTop: '8px' }}>
+          <span style={{ color: '#32D74B', fontWeight: 'bold' }}>
+            rahul@rahulos
           </span>
-          <span>&nbsp;</span>
+          <span style={{ color: '#f5f5f7' }}>:</span>
+          <span style={{ color: '#0A84FF', fontWeight: 'bold' }}>
+            {displayCwd}
+          </span>
+          <span style={{ color: '#f5f5f7' }}>$ </span>
           <div style={{ position: 'relative', flex: 1 }}>
+            {/* Visual text + block cursor */}
+            <span style={{ pointerEvents: 'none', color: '#f5f5f7' }}>
+              {input}
+              <span
+                className="terminal-block-cursor"
+                style={{
+                  display: 'inline-block',
+                  width: '8px',
+                  height: '14px',
+                  background: '#f5f5f7',
+                  verticalAlign: 'text-bottom',
+                  marginLeft: '1px',
+                  animation: 'terminal-blink 1s step-end infinite',
+                  boxShadow: '0 0 2px rgba(255,255,255,0.5)',
+                }}
+              />
+            </span>
+            {/* Hidden input for capturing keystrokes */}
             <input
               ref={inputRef}
               value={input}
@@ -308,22 +325,33 @@ export function Terminal({ windowId }: { windowId: string }) {
               autoComplete="off"
               autoCapitalize="off"
               style={{
+                position: 'absolute',
+                left: 0,
+                top: 0,
+                width: '100%',
+                height: '100%',
                 background: 'transparent',
                 border: 'none',
                 outline: 'none',
-                color: '#cdd6f4',
+                color: 'transparent',
+                caretColor: 'transparent',
                 fontFamily: 'inherit',
                 fontSize: 'inherit',
                 lineHeight: 'inherit',
-                width: '100%',
                 padding: 0,
                 margin: 0,
-                caretColor: '#a6e3a1',
               }}
             />
           </div>
         </div>
       </div>
+
+      <style>{`
+        @keyframes terminal-blink {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0; }
+        }
+      `}</style>
     </div>
   );
 }

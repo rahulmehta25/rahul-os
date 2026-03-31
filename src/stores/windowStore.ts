@@ -52,8 +52,8 @@ interface WindowStore {
 let windowCounter = 0;
 
 const cascadeOffset = (index: number): Position => ({
-  x: 80 + (index % 8) * 30,
-  y: 60 + (index % 8) * 30,
+  x: 150 + (index % 8) * 30,
+  y: 100 + (index % 8) * 30,
 });
 
 export const useWindowStore = create<WindowStore>((set, get) => ({

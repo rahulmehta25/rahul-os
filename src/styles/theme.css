@@ -1,64 +1,79 @@
 :root {
-  /* Background & Surface */
-  --color-bg-desktop: #1a1a2e;
-  --color-bg-surface: rgba(30, 30, 46, 0.82);
-  --color-bg-surface-solid: #1e1e2e;
-  --color-bg-titlebar: rgba(36, 36, 54, 0.97);
-  --color-bg-titlebar-inactive: rgba(44, 44, 60, 0.92);
-  --color-bg-dock: rgba(24, 24, 40, 0.65);
-  --color-bg-menubar: rgba(0, 0, 0, 0.28);
+  /* Background & Surface — macOS Sequoia dark */
+  --color-bg-desktop: #1a1a1a;
+  --color-bg-surface: rgba(38, 38, 38, 0.97);
+  --color-bg-surface-solid: #282828;
+  --color-bg-titlebar: rgba(50, 50, 50, 0.97);
+  --color-bg-titlebar-inactive: rgba(46, 46, 46, 0.92);
+  --color-bg-dock: rgba(40, 40, 40, 0.55);
+  --color-bg-menubar: rgba(30, 30, 30, 0.72);
   --color-bg-input: rgba(255, 255, 255, 0.06);
   --color-bg-hover: rgba(255, 255, 255, 0.08);
   --color-bg-active: rgba(255, 255, 255, 0.12);
 
-  /* Text */
-  --color-text-primary: #cdd6f4;
-  --color-text-secondary: #a6adc8;
-  --color-text-tertiary: #6c7086;
-  --color-text-inverse: #1e1e2e;
+  /* Text — Apple system colors */
+  --color-text-primary: #f5f5f7;
+  --color-text-secondary: #a1a1a6;
+  --color-text-tertiary: #6e6e73;
+  --color-text-inverse: #1d1d1f;
 
-  /* Accent */
-  --color-accent: #89b4fa;
-  --color-accent-hover: #74c7ec;
-  --color-accent-subtle: rgba(137, 180, 250, 0.15);
+  /* Accent — macOS Blue */
+  --color-accent: #0A84FF;
+  --color-accent-hover: #409CFF;
+  --color-accent-subtle: rgba(10, 132, 255, 0.15);
 
-  /* Traffic lights */
-  --color-close: #ff5f57;
-  --color-minimize: #febc2e;
-  --color-maximize: #28c840;
-  --color-traffic-inactive: #4a4a4a;
+  /* Traffic lights — exact macOS colors */
+  --color-close: #FF5F57;
+  --color-minimize: #FEBC2E;
+  --color-maximize: #28C840;
+  --color-traffic-inactive: #3C3C3C;
 
   /* Borders */
   --color-border: rgba(255, 255, 255, 0.1);
-  --color-border-active: rgba(255, 255, 255, 0.18);
+  --color-border-active: rgba(255, 255, 255, 0.16);
 
-  /* Shadows */
-  --shadow-window: 0 10px 40px rgba(0, 0, 0, 0.45), 0 2px 10px rgba(0, 0, 0, 0.25), inset 0 0.5px 0 rgba(255, 255, 255, 0.06);
-  --shadow-window-active: 0 16px 56px rgba(0, 0, 0, 0.55), 0 4px 16px rgba(0, 0, 0, 0.35), inset 0 0.5px 0 rgba(255, 255, 255, 0.08);
-  --shadow-dock: 0 0 40px rgba(0, 0, 0, 0.35), 0 0 2px rgba(0, 0, 0, 0.2);
-  --shadow-menubar: 0 0.5px 0 rgba(255, 255, 255, 0.05);
-  --shadow-context-menu: 0 12px 40px rgba(0, 0, 0, 0.5), 0 0 1px rgba(0, 0, 0, 0.3);
+  /* Shadows — macOS Sequoia layered shadow system */
+  --shadow-window:
+    0 0 0 0.5px rgba(0, 0, 0, 0.18),
+    0 2px 4px rgba(0, 0, 0, 0.06),
+    0 8px 24px rgba(0, 0, 0, 0.09),
+    0 24px 48px rgba(0, 0, 0, 0.12);
+  --shadow-window-active:
+    0 0 0 0.5px rgba(0, 0, 0, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    0 8px 24px rgba(0, 0, 0, 0.15),
+    0 24px 48px rgba(0, 0, 0, 0.2);
+  --shadow-dock:
+    0 0 0 0.5px rgba(255, 255, 255, 0.12),
+    0 8px 32px rgba(0, 0, 0, 0.35),
+    0 2px 8px rgba(0, 0, 0, 0.2);
+  --shadow-menubar: 0 0.5px 0 rgba(0, 0, 0, 0.3);
+  --shadow-context-menu:
+    0 0 0 0.5px rgba(255, 255, 255, 0.12),
+    0 12px 40px rgba(0, 0, 0, 0.5),
+    0 2px 8px rgba(0, 0, 0, 0.3);
 
-  /* Radii */
-  --radius-window: 12px;
+  /* Radii — macOS standard */
+  --radius-window: 10px;
   --radius-dock: 16px;
   --radius-button: 6px;
-  --radius-context-menu: 8px;
+  --radius-context-menu: 6px;
 
   /* Spacing */
-  --titlebar-height: 42px;
-  --menubar-height: 30px;
+  --titlebar-height: 52px;
+  --menubar-height: 25px;
   --dock-height: 72px;
-  --dock-margin: 6px;
+  --dock-margin: 4px;
 
-  /* Typography */
-  --font-system: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
-  --font-mono: 'SF Mono', 'Fira Code', 'JetBrains Mono', 'Cascadia Code', monospace;
+  /* Typography — SF Pro system stack */
+  --font-system: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', system-ui, sans-serif;
+  --font-mono: 'SF Mono', 'Menlo', 'Monaco', 'Fira Code', 'JetBrains Mono', monospace;
 
-  /* Animation */
+  /* Animation — spring-like curves */
   --transition-fast: 120ms ease;
   --transition-normal: 200ms ease;
-  --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --transition-spring: 500ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
 
   /* Z-index layers */
   --z-desktop: 0;
@@ -73,29 +88,46 @@
 }
 
 [data-theme='light'] {
-  --color-bg-desktop: #dce0e8;
-  --color-bg-surface: rgba(239, 241, 245, 0.9);
-  --color-bg-surface-solid: #eff1f5;
-  --color-bg-titlebar: rgba(239, 241, 245, 0.95);
-  --color-bg-titlebar-inactive: rgba(230, 232, 238, 0.9);
-  --color-bg-dock: rgba(239, 241, 245, 0.8);
-  --color-bg-menubar: rgba(230, 232, 238, 0.85);
+  --color-bg-desktop: #ececec;
+  --color-bg-surface: rgba(246, 246, 246, 0.96);
+  --color-bg-surface-solid: #f6f6f6;
+  --color-bg-titlebar: rgba(236, 236, 236, 0.96);
+  --color-bg-titlebar-inactive: rgba(232, 232, 232, 0.92);
+  --color-bg-dock: rgba(246, 246, 246, 0.75);
+  --color-bg-menubar: rgba(244, 244, 244, 0.88);
   --color-bg-input: rgba(0, 0, 0, 0.04);
-  --color-bg-hover: rgba(0, 0, 0, 0.06);
-  --color-bg-active: rgba(0, 0, 0, 0.1);
-  --color-text-primary: #4c4f69;
-  --color-text-secondary: #6c6f85;
-  --color-text-tertiary: #9ca0b0;
-  --color-text-inverse: #eff1f5;
-  --color-accent: #1e66f5;
-  --color-accent-hover: #2a6ef7;
-  --color-accent-subtle: rgba(30, 102, 245, 0.12);
-  --color-close: #d20f39;
-  --color-minimize: #df8e1d;
-  --color-maximize: #40a02b;
-  --color-traffic-inactive: #bcc0cc;
+  --color-bg-hover: rgba(0, 0, 0, 0.05);
+  --color-bg-active: rgba(0, 0, 0, 0.08);
+  --color-text-primary: #1d1d1f;
+  --color-text-secondary: #6e6e73;
+  --color-text-tertiary: #aeaeb2;
+  --color-text-inverse: #f5f5f7;
+  --color-accent: #007AFF;
+  --color-accent-hover: #0070E0;
+  --color-accent-subtle: rgba(0, 122, 255, 0.1);
+  --color-close: #FF5F57;
+  --color-minimize: #FEBC2E;
+  --color-maximize: #28C840;
+  --color-traffic-inactive: #d4d4d4;
   --color-border: rgba(0, 0, 0, 0.08);
-  --color-border-active: rgba(0, 0, 0, 0.15);
-  --shadow-window: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
-  --shadow-window-active: 0 12px 48px rgba(0, 0, 0, 0.16), 0 4px 12px rgba(0, 0, 0, 0.1);
+  --color-border-active: rgba(0, 0, 0, 0.12);
+  --shadow-window:
+    0 0 0 0.5px rgba(0, 0, 0, 0.10),
+    0 2px 4px rgba(0, 0, 0, 0.04),
+    0 8px 24px rgba(0, 0, 0, 0.06),
+    0 24px 48px rgba(0, 0, 0, 0.08);
+  --shadow-window-active:
+    0 0 0 0.5px rgba(0, 0, 0, 0.16),
+    0 2px 4px rgba(0, 0, 0, 0.06),
+    0 8px 24px rgba(0, 0, 0, 0.10),
+    0 24px 48px rgba(0, 0, 0, 0.14);
+  --shadow-dock:
+    0 0 0 0.5px rgba(0, 0, 0, 0.1),
+    0 8px 32px rgba(0, 0, 0, 0.12),
+    0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-menubar: 0 0.5px 0 rgba(0, 0, 0, 0.12);
+  --shadow-context-menu:
+    0 0 0 0.5px rgba(0, 0, 0, 0.1),
+    0 12px 40px rgba(0, 0, 0, 0.15),
+    0 2px 8px rgba(0, 0, 0, 0.08);
 }

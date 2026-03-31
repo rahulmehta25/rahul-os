@@ -14,9 +14,9 @@ interface SettingsStore {
 }
 
 export const useSettingsStore = create<SettingsStore>((set) => ({
-  wallpaper: '',
+  wallpaper: 'radial-gradient(ellipse at 75% 85%, #F5872A 0%, #D4692A 8%, #8B6E35 16%, #3E8F4A 26%, #1A9068 36%, #0D7B7A 46%, #0B5A6E 56%, #142D50 68%, #2A1F5C 80%, #3C2068 90%, #281548 100%)',
   theme: 'dark',
-  accentColor: '#89b4fa',
+  accentColor: '#0A84FF',
   hasCompletedBoot: false,
   fontSize: 'medium',
 

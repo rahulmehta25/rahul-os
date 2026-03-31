@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 import { useWindowStore } from '../../stores/windowStore.ts';
+import { TerminalIcon, FinderIcon, SettingsIcon } from '../shared/AppIcons.tsx';
 
 interface DesktopIcon {
   appId: string;
@@ -12,63 +13,19 @@ const icons: DesktopIcon[] = [
   {
     appId: 'terminal',
     label: 'Terminal',
-    icon: (
-      <svg viewBox="0 0 32 32" width="56" height="56">
-        <defs>
-          <linearGradient id="grad-terminal" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#2a2a3e" />
-            <stop offset="100%" stopColor="#1e1e2e" />
-          </linearGradient>
-        </defs>
-        <rect width="32" height="32" rx="7" fill="url(#grad-terminal)" />
-        <path d="M8 22L14 16L8 10" stroke="#a6e3a1" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-        <line x1="16" y1="22" x2="24" y2="22" stroke="#a6e3a1" strokeWidth="2.5" strokeLinecap="round" />
-      </svg>
-    ),
+    icon: <TerminalIcon />,
     defaultSize: { width: 680, height: 420 },
   },
   {
     appId: 'filemanager',
     label: 'Files',
-    icon: (
-      <svg viewBox="0 0 32 32" width="56" height="56">
-        <defs>
-          <linearGradient id="grad-files" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#9dc4fc" />
-            <stop offset="100%" stopColor="#89b4fa" />
-          </linearGradient>
-        </defs>
-        <rect width="32" height="32" rx="7" fill="url(#grad-files)" />
-        <path d="M6 10C6 8.9 6.9 8 8 8H13L15 11H24C25.1 11 26 11.9 26 13V22C26 23.1 25.1 24 24 24H8C6.9 24 6 23.1 6 22V10Z" fill="white" fillOpacity="0.9" />
-      </svg>
-    ),
+    icon: <FinderIcon />,
     defaultSize: { width: 800, height: 520 },
   },
   {
     appId: 'settings',
     label: 'Settings',
-    icon: (
-      <svg viewBox="0 0 32 32" width="56" height="56">
-        <defs>
-          <linearGradient id="grad-settings" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#7c8096" />
-            <stop offset="100%" stopColor="#6c7086" />
-          </linearGradient>
-        </defs>
-        <rect width="32" height="32" rx="7" fill="url(#grad-settings)" />
-        <circle cx="16" cy="16" r="5" stroke="white" strokeWidth="2" fill="none" />
-        <g stroke="white" strokeWidth="2" strokeLinecap="round">
-          <line x1="16" y1="4" x2="16" y2="8" />
-          <line x1="16" y1="24" x2="16" y2="28" />
-          <line x1="4" y1="16" x2="8" y2="16" />
-          <line x1="24" y1="16" x2="28" y2="16" />
-          <line x1="7.5" y1="7.5" x2="10.3" y2="10.3" />
-          <line x1="21.7" y1="21.7" x2="24.5" y2="24.5" />
-          <line x1="7.5" y1="24.5" x2="10.3" y2="21.7" />
-          <line x1="21.7" y1="10.3" x2="24.5" y2="7.5" />
-        </g>
-      </svg>
-    ),
+    icon: <SettingsIcon />,
     defaultSize: { width: 600, height: 450 },
   },
 ];
@@ -104,7 +61,7 @@ export function DesktopIcons() {
         left: '16px',
         zIndex: 'var(--z-desktop-icons)',
         display: 'grid',
-        gridTemplateColumns: '90px',
+        gridTemplateColumns: '86px',
         gridAutoRows: '90px',
       }}
       onClick={handleDesktopClick}
@@ -115,30 +72,51 @@ export function DesktopIcons() {
         return (
           <button
             key={icon.appId}
-            className="flex flex-col items-center justify-start gap-1.5 rounded-lg"
+            className="flex flex-col items-center justify-start gap-1 rounded-lg"
             style={{
-              width: '90px',
-              paddingTop: '8px',
+              width: '86px',
+              paddingTop: '6px',
               paddingBottom: '4px',
-              background: isSelected ? 'rgba(137, 180, 250, 0.2)' : 'transparent',
+              background: isSelected ? 'rgba(10, 132, 255, 0.25)' : 'transparent',
               border: 'none',
               cursor: 'pointer',
-              transition: 'background 120ms',
+              transition: 'background 100ms',
               outline: 'none',
             }}
             onClick={(e) => handleClick(e, icon.appId)}
             onDoubleClick={() => handleDoubleClick(icon)}
             aria-label={`Open ${icon.label}`}
           >
-            <div style={{ width: '56px', height: '56px', flexShrink: 0 }}>
+            <div
+              style={{
+                width: '56px',
+                height: '56px',
+                flexShrink: 0,
+                filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.35)) drop-shadow(0 1px 2px rgba(0,0,0,0.2))',
+                borderRadius: '13px',
+                overflow: 'hidden',
+                position: 'relative',
+              }}
+            >
               {icon.icon}
+              {/* Glass highlight overlay */}
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  borderRadius: '13px',
+                  background: 'linear-gradient(180deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 50%)',
+                  pointerEvents: 'none',
+                }}
+              />
             </div>
             <span
               style={{
                 fontSize: '11px',
                 color: 'white',
                 fontFamily: 'var(--font-system)',
-                textShadow: '0 1px 3px rgba(0,0,0,0.7), 0 0px 6px rgba(0,0,0,0.4)',
+                fontWeight: 500,
+                textShadow: '0 1px 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.5), 0 2px 12px rgba(0,0,0,0.3)',
                 lineHeight: 1.2,
                 maxWidth: '76px',
                 textAlign: 'center',

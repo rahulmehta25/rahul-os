@@ -1,5 +1,6 @@
 import { Suspense, useEffect, useRef } from 'react';
 import { useWindowStore } from '../../stores/windowStore.ts';
+import { useShallow } from 'zustand/react/shallow';
 import { useSettingsStore } from '../../stores/settingsStore.ts';
 import { useNotificationStore } from '../../stores/notificationStore.ts';
 import { useModalStore } from '../../stores/modalStore.ts';
@@ -21,7 +22,7 @@ function AppLoader({ appId, windowId, appProps }: { appId: string; windowId: str
         className="flex items-center justify-center h-full"
         style={{ color: 'var(--color-text-secondary)', fontFamily: 'var(--font-mono)', fontSize: '14px' }}
       >
-        {appId} — coming soon
+        {appId} - coming soon
       </div>
     );
   }
@@ -43,25 +44,41 @@ function AppLoader({ appId, windowId, appProps }: { appId: string; windowId: str
   );
 }
 
+// Each window subscribes to only its own state, preventing cross-window re-renders
+function WindowContainer({ windowId }: { windowId: string }) {
+  const win = useWindowStore((s) => s.windows[windowId]);
+  if (!win) return null;
+  return (
+    <Window state={win}>
+      <AppLoader appId={win.appId} windowId={win.id} appProps={win.appProps} />
+    </Window>
+  );
+}
+
+// Only re-renders when windows are added or removed, not on position/size/focus changes
 function WindowManager() {
-  const windows = useWindowStore((s) => s.windows);
+  const windowIds = useWindowStore(useShallow((s) => Object.keys(s.windows)));
 
   return (
     <>
-      {Object.values(windows).map((win) => (
-        <Window key={win.id} state={win}>
-          <AppLoader appId={win.appId} windowId={win.id} appProps={win.appProps} />
-        </Window>
+      {windowIds.map((id) => (
+        <WindowContainer key={id} windowId={id} />
       ))}
     </>
   );
 }
 
-const DEFAULT_WALLPAPER = 'linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 30%, #16213e 60%, #0f3460 100%)';
+const SEQUOIA_DARK = 'radial-gradient(ellipse at 75% 85%, #F5872A 0%, #D4692A 8%, #8B6E35 16%, #3E8F4A 26%, #1A9068 36%, #0D7B7A 46%, #0B5A6E 56%, #142D50 68%, #2A1F5C 80%, #3C2068 90%, #281548 100%)';
+const SEQUOIA_LIGHT = 'radial-gradient(ellipse at 75% 85%, #FDCFA1 0%, #F4BC90 8%, #D6CC94 16%, #96D8A6 26%, #7AD4B8 36%, #78C8C8 46%, #82BCD2 56%, #94B4D8 68%, #B4A4D8 80%, #C8B0E0 90%, #BAA4D6 100%)';
+const DEFAULT_WALLPAPER = SEQUOIA_DARK;
 
 export function Desktop() {
   const wallpaper = useSettingsStore((s) => s.wallpaper);
-  const windows = useWindowStore((s) => s.windows);
+  const theme = useSettingsStore((s) => s.theme);
+  // Derived boolean: only re-renders Desktop when a terminal is first opened, not on every window change
+  const hasTerminal = useWindowStore((s) =>
+    Object.values(s.windows).some((w) => w.appId === 'terminal'),
+  );
   const push = useNotificationStore((s) => s.push);
   const activeModal = useModalStore((s) => s.activeModal);
   const notifsFired = useRef(false);
@@ -73,8 +90,7 @@ export function Desktop() {
     if (notifsFired.current) return;
     notifsFired.current = true;
 
-    // Welcome notification after 2s
-    setTimeout(() => {
+    const t1 = setTimeout(() => {
       push({
         title: 'Welcome to RahulOS',
         body: 'Explore the desktop, open apps from the dock, or right-click for options.',
@@ -82,20 +98,23 @@ export function Desktop() {
       });
     }, 2000);
 
-    // Projects hint after 60s
-    setTimeout(() => {
+    const t2 = setTimeout(() => {
       push({
         title: 'Check out the Projects folder',
         body: 'Open Files from the dock to browse project showcases.',
         duration: 5000,
       });
     }, 60000);
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
   }, [push]);
 
   // Terminal hint on first terminal open
   useEffect(() => {
     if (terminalHintFired.current) return;
-    const hasTerminal = Object.values(windows).some((w) => w.appId === 'terminal');
     if (hasTerminal) {
       terminalHintFired.current = true;
       push({
@@ -104,7 +123,7 @@ export function Desktop() {
         duration: 5000,
       });
     }
-  }, [windows, push]);
+  }, [hasTerminal, push]);
 
   return (
     <div
@@ -112,7 +131,9 @@ export function Desktop() {
       role="application"
       aria-label="RahulOS Desktop"
       style={{
-        background: wallpaper || DEFAULT_WALLPAPER,
+        background: theme === 'light' && (!wallpaper || wallpaper === SEQUOIA_DARK)
+          ? SEQUOIA_LIGHT
+          : (wallpaper || DEFAULT_WALLPAPER),
       }}
     >
       {/* Subtle noise texture overlay */}

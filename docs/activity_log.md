@@ -108,3 +108,88 @@
 - Build and typecheck both pass clean
 
 ---
+
+## 2026-03-24 EST (Late Evening - Documentation)
+
+### User Prompt
+"Write documentation for RahulOS: README.md, docs/ARCHITECTURE.md, docs/COMPONENTS.md, LICENSE"
+
+### Actions Taken
+- Rewrote `README.md` with hero section, live demo link, feature list, tech stack table, architecture overview, project structure, getting started instructions, deployment section, easter eggs, and license
+- Created `docs/ARCHITECTURE.md` with ASCII component hierarchy, 6 Zustand store schemas, boot flow, drag/resize system internals, app registry details, and performance design decisions
+- Created `docs/COMPONENTS.md` with full reference for Window system, Desktop shell, 7 apps, effects, boot, mobile fallback, and notifications
+- Created `LICENSE` (MIT, Rahul Mehta, 2026)
+
+---
+
+## 2026-03-24 EST (Late Evening - Visual Polish)
+
+### User Prompt
+"Visual polish pass to make RahulOS indistinguishable from macOS Sequoia"
+
+### Actions Taken
+- Terminal: Added blinking block cursor via CSS overlay (hidden input captures keystrokes, visible span renders text + block cursor with animation)
+- Dock: Adjusted MAX_SIZE from 64px to 56px per macOS Sequoia spec for more subtle magnification
+- Settings: Added macOS system accent colors (Blue, Purple, Pink, Red, Orange, Yellow, Green, Graphite) replacing Catppuccin palette; added Slate wallpaper option
+- Files modified: src/apps/Terminal/Terminal.tsx, src/components/Desktop/Dock.tsx, src/apps/Settings/Settings.tsx
+- Build verified: npx vite build passes clean
+
+---
+
+## 2026-03-24 04:06 EST
+
+### User Prompt
+"Write documentation for RahulOS (web-based macOS portfolio OS, React + Vite + TypeScript + Zustand). Create README.md, docs/ARCHITECTURE.md, docs/COMPONENTS.md, LICENSE."
+
+### Actions Taken
+- Rewrote README.md with hero section, badges, features table, tech stack, architecture overview, getting started, deployment, project structure, and easter eggs
+- Rewrote docs/ARCHITECTURE.md with ASCII component hierarchy, Zustand store schemas, boot flow, drag/resize system internals, app registry details, performance design decisions, theming reference, and "adding a new app" guide
+- Rewrote docs/COMPONENTS.md with complete component reference for Window system, Desktop shell, 7 apps, effects, boot, mobile fallback, notifications, and custom hooks
+- LICENSE file already exists with MIT license and correct attribution
+
+---
+
+## 2026-03-24 05:15 EST
+
+### User Prompt
+"Polish task: Make the SNAKE GAME genuinely fun and visually polished in RahulOS."
+
+### Actions Taken
+- Complete rewrite of `src/apps/Snake/Snake.tsx` with premium game polish
+- Added smooth interpolated movement with requestAnimationFrame and delta-time calculations
+- Snake gradient (bright green head to dark green tail) with eyes that follow direction
+- Food with radial glow, pulse animation, and specular highlight
+- Particle effects on eating (14-particle burst) and wall impact (10 particles) with fade and physics
+- Screen shake on death with fade-out effect
+- Green flash overlay on eating food
+- Start screen with animated demo snake (figure-8 loop), title glow, pulse CTA button
+- Game over screen with shake-in animation, large score display, NEW BEST detection with star indicator
+- Speed progression system (120ms to 55ms, increasing every 50 points scored)
+- localStorage high score persistence across sessions
+- Touch/swipe support for mobile gameplay
+- Keyboard controls: WASD + Arrow keys + SPACE/Enter to start/restart
+- Build verified: npx vite build passes clean with zero errors
+
+---
+
+## 2026-03-24 EST (App Icons Polish)
+
+### User Prompt
+"The app logos don't look clean and is throwing off the whole mac sequoia look, can you fix that for me?"
+
+### Actions Taken
+- Created `src/components/shared/AppIcons.tsx` with 6 polished macOS Sequoia-style icon components (Terminal, Finder, TextEdit, Safari, Settings, Snake)
+- All icons use useId() for unique SVG gradient/clipPath IDs preventing DOM collisions
+- Redesigned Finder icon: proper two-tone blue face with clipPath, rounded-rect eyes, clean smile
+- Redesigned TextEdit icon: replaced garish rainbow lines with monochrome text at decreasing opacity, subtle ruled lines
+- Redesigned Safari icon: diamond compass needle rotated 22deg, intercardinal ticks, cleaner proportions
+- Redesigned Settings icon: filled white gear with evenodd cutout (8 teeth, outerR=38, innerR=26) replacing barely-visible stroke outline
+- Added new Snake icon: green gradient, S-curve body, apple target
+- Updated `src/components/Desktop/Dock.tsx` to import shared icons, removed all inline SVG definitions and generateGearPath function
+- Updated `src/components/Desktop/DesktopIcons.tsx` to import shared icons, removed all inline SVG definitions
+- Fixed Finder inconsistency: Desktop showed folder shape, Dock showed face. Now unified.
+- Fixed Settings inconsistency: Desktop showed sun/asterisk, Dock showed thin gear. Now unified.
+- Added Snake to Dock's dockApps array (was registered with showInDock: true but missing)
+- Build passes clean (TypeScript + Vite)
+
+---

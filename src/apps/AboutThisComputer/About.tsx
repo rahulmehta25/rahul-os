@@ -58,7 +58,7 @@ export function AboutModal() {
     <div
       className="fixed inset-0 flex items-center justify-center"
       style={{
-        zIndex: 'var(--z-context-menu)',
+        zIndex: 'var(--z-modal)',
         background: 'rgba(0,0,0,0.5)',
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',

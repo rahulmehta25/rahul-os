@@ -1,28 +1,37 @@
 import type { CommandContext, CommandResult } from '../shell';
 
 export function projects(_args: string[], _ctx: CommandContext): CommandResult {
-  return {
-    output: [
-      '',
-      '\x1b[1;36m  Rahul Mehta — Project Portfolio\x1b[0m',
-      '',
-      '  ┌──────────────────────────┬────────────┬────────────────────────────────────┐',
-      '  │ \x1b[1mProject\x1b[0m                    │ \x1b[1mStatus\x1b[0m     │ \x1b[1mStack\x1b[0m                              │',
-      '  ├──────────────────────────┼────────────┼────────────────────────────────────┤',
-      '  │ \x1b[1;33mOsmoti\x1b[0m                     │ \x1b[1;32m● Active\x1b[0m   │ Next.js, Express, Prisma, AWS      │',
-      '  │ \x1b[1;33mKeep Safe\x1b[0m                  │ \x1b[1;32m● Active\x1b[0m   │ React, OpenAI, Firebase            │',
-      '  │ \x1b[1;33mAnalytics Pro\x1b[0m              │ \x1b[1;32m● Active\x1b[0m   │ FastAPI, BigQuery, Vertex AI       │',
-      '  │ \x1b[1;33mSmart Legal Contracts\x1b[0m      │ \x1b[1;32m● Active\x1b[0m   │ FastAPI, sentence-transformers     │',
-      '  │ \x1b[1;33mRahulOS\x1b[0m                    │ \x1b[1;32m● Active\x1b[0m   │ React 19, Zustand, Tailwind        │',
-      '  │ \x1b[1;37mVoice Visualizer\x1b[0m           │ \x1b[1;34m○ Complete\x1b[0m │ Vanilla JS, Web Audio API          │',
-      '  │ \x1b[1;37mScreenshot Reviewer\x1b[0m        │ \x1b[1;32m● Active\x1b[0m   │ SwiftUI, Vision, macOS native      │',
-      '  │ \x1b[1;37mACP Dashboard\x1b[0m              │ \x1b[1;32m● Active\x1b[0m   │ Next.js, SSE, Agent orchestration  │',
-      '  └──────────────────────────┴────────────┴────────────────────────────────────┘',
-      '',
-      '  \x1b[2mRun "cat ~/projects/<name>/README.md" for details on any project.\x1b[0m',
-      '',
-    ],
-  };
+  const projectList = [
+    { name: 'Osmoti', status: 'Active', desc: 'B2B SaaS for ad performance management & optimization', stack: 'Next.js \u00B7 Express \u00B7 Prisma \u00B7 AWS', link: 'osmoti.com' },
+    { name: 'Keep Safe', status: 'Active', desc: 'Hotel/resort smart safe with speaker, charger & AI concierge', stack: 'React \u00B7 OpenAI \u00B7 Firebase', link: 'beachbox.co' },
+    { name: 'Analytics Pro', status: 'Active', desc: 'Marketing analytics platform with AI-powered query & RAG', stack: 'FastAPI \u00B7 BigQuery \u00B7 Vertex AI', link: 'analytics-pro-frontend.vercel.app' },
+    { name: 'RahulOS', status: 'Active', desc: "Web-based macOS desktop environment (you're using it!)", stack: 'React 19 \u00B7 Zustand \u00B7 Tailwind \u00B7 Vite', link: '' },
+    { name: 'Screenshot Reviewer', status: 'Active', desc: 'Native macOS app for reviewing & cleaning screenshots', stack: 'SwiftUI \u00B7 Vision \u00B7 macOS native', link: '' },
+    { name: 'ACP Dashboard', status: 'Active', desc: 'Jarvis-style mission control for AI coding agents', stack: 'Next.js \u00B7 SSE \u00B7 Agent orchestration', link: '' },
+    { name: 'Voice Visualizer', status: 'Complete', desc: 'Real-time audio visualization, zero dependencies', stack: 'Vanilla JS \u00B7 Web Audio API \u00B7 Canvas', link: 'voice-visualizer-eight.vercel.app' },
+  ];
+
+  const lines: string[] = [
+    '',
+    '\x1b[1;36m  \u2500\u2500\u2500 Project Portfolio \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\x1b[0m',
+    '',
+  ];
+
+  for (const p of projectList) {
+    const statusColor = p.status === 'Active' ? '\x1b[1;32m\u25CF' : '\x1b[1;34m\u25CB';
+    lines.push(`  \x1b[1;33m${p.name}\x1b[0m  ${statusColor} ${p.status}\x1b[0m`);
+    lines.push(`  ${p.desc}`);
+    lines.push(`  \x1b[2m${p.stack}\x1b[0m`);
+    if (p.link) {
+      lines.push(`  \x1b[35m${p.link}\x1b[0m`);
+    }
+    lines.push('');
+  }
+
+  lines.push('\x1b[2m  Run "cat ~/projects/<name>/README.md" for details.\x1b[0m');
+  lines.push('');
+
+  return { output: lines };
 }
 
 export function open(args: string[], ctx: CommandContext): CommandResult {
@@ -87,16 +96,20 @@ export function osmoti(args: string[], _ctx: CommandContext): CommandResult {
 }
 
 const fortunes = [
-  '"The best way to predict the future is to build it." — Alan Kay',
-  '"First, solve the problem. Then, write the code." — John Johnson',
-  '"Simplicity is the soul of efficiency." — Austin Freeman',
-  '"Talk is cheap. Show me the code." — Linus Torvalds',
-  '"Any fool can write code that a computer can understand. Good programmers write code that humans can understand." — Martin Fowler',
-  '"Programs must be written for people to read, and only incidentally for machines to execute." — Abelson & Sussman',
-  '"The most disastrous thing that you can ever learn is your first programming language." — Alan Kay',
-  '"It works on my machine." — Every developer, at least once',
-  '"There are only two hard things in Computer Science: cache invalidation and naming things." — Phil Karlton',
-  '"If debugging is the process of removing bugs, then programming must be the process of putting them in." — Edsger Dijkstra',
+  '"The best way to predict the future is to build it." \x1b[2m\u2014 Alan Kay\x1b[0m',
+  '"First, solve the problem. Then, write the code." \x1b[2m\u2014 John Johnson\x1b[0m',
+  '"Simplicity is the soul of efficiency." \x1b[2m\u2014 Austin Freeman\x1b[0m',
+  '"Talk is cheap. Show me the code." \x1b[2m\u2014 Linus Torvalds\x1b[0m',
+  '"Any fool can write code that a computer can understand. Good programmers write code that humans can understand." \x1b[2m\u2014 Martin Fowler\x1b[0m',
+  '"Programs must be written for people to read, and only incidentally for machines to execute." \x1b[2m\u2014 Abelson & Sussman\x1b[0m',
+  '"The most disastrous thing that you can ever learn is your first programming language." \x1b[2m\u2014 Alan Kay\x1b[0m',
+  '"It works on my machine." \x1b[2m\u2014 Every developer, at least once\x1b[0m',
+  '"There are only two hard things in Computer Science: cache invalidation and naming things." \x1b[2m\u2014 Phil Karlton\x1b[0m',
+  '"If debugging is the process of removing bugs, then programming must be the process of putting them in." \x1b[2m\u2014 Edsger Dijkstra\x1b[0m',
+  '"The only way to do great work is to love what you do." \x1b[2m\u2014 Steve Jobs\x1b[0m',
+  '"Measuring programming progress by lines of code is like measuring aircraft building progress by weight." \x1b[2m\u2014 Bill Gates\x1b[0m',
+  '"The best error message is the one that never shows up." \x1b[2m\u2014 Thomas Fuchs\x1b[0m',
+  '"Code is like humor. When you have to explain it, it\'s bad." \x1b[2m\u2014 Cory House\x1b[0m',
 ];
 
 export function fortune(_args: string[], _ctx: CommandContext): CommandResult {
@@ -106,15 +119,15 @@ export function fortune(_args: string[], _ctx: CommandContext): CommandResult {
 
 export function cowsay(args: string[], _ctx: CommandContext): CommandResult {
   const msg = args.length > 0 ? args.join(' ') : 'Moo! Welcome to RahulOS!';
-  const border = '─'.repeat(msg.length + 2);
+  const border = '\u2500'.repeat(msg.length + 2);
   return {
     output: [
-      ` ┌${border}┐`,
-      ` │ ${msg} │`,
-      ` └${border}┘`,
-      '        \\   ^__^',
-      '         \\  (oo)\\_______',
-      '            (__)\\       )\\/\\',
+      `\x1b[1;33m \u250C${border}\u2510\x1b[0m`,
+      `\x1b[1;33m \u2502\x1b[0m ${msg} \x1b[1;33m\u2502\x1b[0m`,
+      `\x1b[1;33m \u2514${border}\u2518\x1b[0m`,
+      '\x1b[1;37m        \\   ^__^\x1b[0m',
+      '\x1b[1;37m         \\  \x1b[1;35m(oo)\x1b[1;37m\\_______\x1b[0m',
+      '\x1b[1;37m            (__)\x1b[0m\\       )\\/\\',
       '                ||----w |',
       '                ||     ||',
     ],

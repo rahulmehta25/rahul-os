@@ -3,33 +3,46 @@ import { useWindowStore } from '../../stores/windowStore.ts';
 import { useModalStore } from '../../stores/modalStore.ts';
 import { appRegistry } from '../../apps/registry.tsx';
 
+type MenuId = 'apple' | 'app' | 'File' | 'Edit' | 'View' | 'Window' | 'Help' | null;
+
 export function MenuBar() {
   const [time, setTime] = useState(new Date());
-  const [menuOpen, setMenuOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
+  const [openMenu, setOpenMenu] = useState<MenuId>(null);
+  const menuBarRef = useRef<HTMLDivElement>(null);
   const openWindow = useWindowStore((s) => s.openWindow);
   const activeWindowId = useWindowStore((s) => s.activeWindowId);
   const windows = useWindowStore((s) => s.windows);
   const openModal = useModalStore((s) => s.openModal);
 
   const activeWindow = activeWindowId ? windows[activeWindowId] : null;
-  const activeAppName = activeWindow?.title ?? null;
+  const activeAppName = activeWindow?.title ?? 'Finder';
 
   useEffect(() => {
     const interval = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(interval);
   }, []);
 
+  // Close on click outside
   useEffect(() => {
-    if (!menuOpen) return;
+    if (!openMenu) return;
     const handleClick = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setMenuOpen(false);
+      if (menuBarRef.current && !menuBarRef.current.contains(e.target as Node)) {
+        setOpenMenu(null);
       }
     };
     document.addEventListener('pointerdown', handleClick);
     return () => document.removeEventListener('pointerdown', handleClick);
-  }, [menuOpen]);
+  }, [openMenu]);
+
+  // Close on Escape
+  useEffect(() => {
+    if (!openMenu) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpenMenu(null);
+    };
+    document.addEventListener('keydown', handleKey);
+    return () => document.removeEventListener('keydown', handleKey);
+  }, [openMenu]);
 
   const handleOpenApp = useCallback(
     (appId: string) => {
@@ -39,10 +52,61 @@ export function MenuBar() {
         size: manifest.defaultSize,
         minSize: manifest.minSize,
       });
-      setMenuOpen(false);
+      setOpenMenu(null);
     },
     [openWindow],
   );
+
+  const handleMenuClick = useCallback((id: MenuId) => {
+    setOpenMenu((prev) => (prev === id ? null : id));
+  }, []);
+
+  const handleMenuHover = useCallback((id: MenuId) => {
+    setOpenMenu((prev) => (prev !== null ? id : prev));
+  }, []);
+
+  const closeMenu = useCallback(() => setOpenMenu(null), []);
+
+  const handleSleep = useCallback(() => {
+    setOpenMenu(null);
+    const overlay = document.createElement('div');
+    overlay.style.cssText =
+      'position:fixed;inset:0;background:#000;z-index:99999;opacity:0;transition:opacity 0.6s ease;cursor:pointer';
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => {
+      overlay.style.opacity = '0.85';
+    });
+    const wake = () => {
+      overlay.style.opacity = '0';
+      overlay.addEventListener('transitionend', () => overlay.remove());
+    };
+    overlay.addEventListener('click', wake);
+    overlay.addEventListener('keydown', wake);
+    setTimeout(wake, 3000);
+  }, []);
+
+  const handleRestart = useCallback(() => {
+    setOpenMenu(null);
+    sessionStorage.removeItem('rahulos-booted');
+    window.location.reload();
+  }, []);
+
+  const handleShutDown = useCallback(() => {
+    setOpenMenu(null);
+    const overlay = document.createElement('div');
+    overlay.style.cssText =
+      'position:fixed;inset:0;background:#000;z-index:99999;opacity:0;transition:opacity 1s ease;display:flex;align-items:center;justify-content:center';
+    const text = document.createElement('div');
+    text.textContent = 'You can close this tab.';
+    text.style.cssText =
+      'color:#86868b;font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:18px;font-weight:300;opacity:0;transition:opacity 1.5s ease 0.8s';
+    overlay.appendChild(text);
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => {
+      overlay.style.opacity = '1';
+      text.style.opacity = '1';
+    });
+  }, []);
 
   const formatted = time.toLocaleTimeString('en-US', {
     hour: 'numeric',
@@ -58,104 +122,129 @@ export function MenuBar() {
 
   return (
     <div
+      data-menubar-root
       className="fixed top-0 left-0 right-0 flex items-center justify-between select-none"
       style={{
         height: 'var(--menubar-height)',
-        background: 'rgba(0, 0, 0, 0.25)',
-        backdropFilter: 'blur(30px)',
-        WebkitBackdropFilter: 'blur(30px)',
-        borderBottom: '1px solid var(--color-border)',
+        background: 'var(--color-bg-menubar)',
+        backdropFilter: 'blur(30px) saturate(1.8)',
+        WebkitBackdropFilter: 'blur(30px) saturate(1.8)',
+        borderBottom: '0.5px solid var(--color-border)',
+        boxShadow: 'var(--shadow-menubar)',
         zIndex: 'var(--z-menubar)',
         fontFamily: 'var(--font-system)',
         fontSize: '13px',
+        fontWeight: 400,
         color: 'var(--color-text-primary)',
-        paddingLeft: '8px',
-        paddingRight: '12px',
+        paddingLeft: '6px',
+        paddingRight: '10px',
       }}
     >
-      {/* Left side: Logo + active app name */}
-      <div className="flex items-center" style={{ height: '100%' }} ref={menuRef}>
-        <button
-          className="flex items-center border-none cursor-default"
-          style={{
-            height: '100%',
-            padding: '0 10px',
-            gap: '6px',
-            background: menuOpen ? 'rgba(255, 255, 255, 0.12)' : 'transparent',
-            borderRadius: '4px',
-            color: 'var(--color-text-primary)',
-            fontFamily: 'var(--font-system)',
-            fontSize: '13px',
-            fontWeight: 600,
-            lineHeight: 1,
-          }}
-          onClick={() => setMenuOpen((v) => !v)}
-          onMouseEnter={(e) => {
-            if (!menuOpen) e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
-          }}
-          onMouseLeave={(e) => {
-            if (!menuOpen) e.currentTarget.style.background = 'transparent';
-          }}
+      {/* Left side: Apple logo + active app name + menus */}
+      <div className="flex items-center" style={{ height: '100%' }} ref={menuBarRef} data-menubar>
+        {/* Apple menu */}
+        <MenuBarButton
+          isOpen={openMenu === 'apple'}
+          onClick={() => handleMenuClick('apple')}
+          onMouseEnter={() => handleMenuHover('apple')}
         >
           <AppleIcon />
-          <span>RahulOS</span>
-        </button>
+        </MenuBarButton>
 
-        {activeAppName && (
-          <span
-            style={{
-              marginLeft: '16px',
-              fontWeight: 400,
-              fontSize: '13px',
-              color: 'var(--color-text-primary)',
-              opacity: 0.9,
-            }}
-          >
-            {activeAppName}
-          </span>
-        )}
-
-        {menuOpen && (
-          <div
-            style={{
-              position: 'absolute',
-              top: 'var(--menubar-height)',
-              left: 4,
-              minWidth: 220,
-              background: 'rgba(30, 30, 30, 0.85)',
-              backdropFilter: 'blur(30px)',
-              WebkitBackdropFilter: 'blur(30px)',
-              borderRadius: 6,
-              border: '1px solid rgba(255, 255, 255, 0.12)',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
-              padding: '4px 0',
-              zIndex: 9999,
-            }}
-          >
+        {openMenu === 'apple' && (
+          <MenuDropdown left={0}>
             <MenuItem
               label="About This Computer"
-              onClick={() => { openModal('about'); setMenuOpen(false); }}
+              onClick={() => { openModal('about'); closeMenu(); }}
             />
+            <MenuSeparator />
             <MenuItem
-              label="Settings"
+              label="System Settings..."
+              shortcut="&#8984;,"
               onClick={() => handleOpenApp('settings')}
             />
-            <div
-              style={{
-                height: 1,
-                background: 'rgba(255, 255, 255, 0.1)',
-                margin: '4px 8px',
-              }}
-            />
+            <MenuSeparator />
+            <MenuItem label="Sleep" onClick={handleSleep} />
+            <MenuItem label="Restart..." onClick={handleRestart} />
+            <MenuItem label="Shut Down..." onClick={handleShutDown} />
+          </MenuDropdown>
+        )}
+
+        {/* Active app name */}
+        <MenuBarButton
+          bold
+          isOpen={openMenu === 'app'}
+          onClick={() => handleMenuClick('app')}
+          onMouseEnter={() => handleMenuHover('app')}
+        >
+          {activeAppName}
+        </MenuBarButton>
+
+        {openMenu === 'app' && (
+          <AppMenuDropdown appName={activeAppName} onClose={closeMenu} openModal={openModal} />
+        )}
+
+        {/* Standard menus */}
+        {(['File', 'Edit', 'View', 'Window', 'Help'] as const).map((label) => (
+          <MenuBarButton
+            key={label}
+            isOpen={openMenu === label}
+            onClick={() => handleMenuClick(label)}
+            onMouseEnter={() => handleMenuHover(label)}
+          >
+            {label}
+          </MenuBarButton>
+        ))}
+
+        {openMenu === 'File' && (
+          <StandardMenuDropdown menuId="File">
+            <MenuItem label="New Window" shortcut="&#8984;N" onClick={closeMenu} />
+            <MenuItem label="New Tab" shortcut="&#8984;T" onClick={closeMenu} />
+            <MenuSeparator />
+            <MenuItem label="Close Window" shortcut="&#8984;W" onClick={closeMenu} />
+          </StandardMenuDropdown>
+        )}
+
+        {openMenu === 'Edit' && (
+          <StandardMenuDropdown menuId="Edit">
+            <MenuItem label="Undo" shortcut="&#8984;Z" onClick={closeMenu} />
+            <MenuItem label="Redo" shortcut="&#8679;&#8984;Z" onClick={closeMenu} />
+            <MenuSeparator />
+            <MenuItem label="Cut" shortcut="&#8984;X" onClick={closeMenu} />
+            <MenuItem label="Copy" shortcut="&#8984;C" onClick={closeMenu} />
+            <MenuItem label="Paste" shortcut="&#8984;V" onClick={closeMenu} />
+            <MenuItem label="Select All" shortcut="&#8984;A" onClick={closeMenu} />
+          </StandardMenuDropdown>
+        )}
+
+        {openMenu === 'View' && (
+          <StandardMenuDropdown menuId="View">
+            <MenuItem label="as Icons" shortcut="&#8984;1" onClick={closeMenu} />
+            <MenuItem label="as List" shortcut="&#8984;2" onClick={closeMenu} />
+            <MenuSeparator />
+            <MenuItemDisabled label="Show Tab Bar" />
+            <MenuItemDisabled label="Show All Tabs" />
+          </StandardMenuDropdown>
+        )}
+
+        {openMenu === 'Window' && (
+          <StandardMenuDropdown menuId="Window">
+            <MenuItem label="Minimize" shortcut="&#8984;M" onClick={closeMenu} />
+            <MenuItem label="Zoom" onClick={closeMenu} />
+            <MenuSeparator />
+            <MenuItemDisabled label="Bring All to Front" />
+          </StandardMenuDropdown>
+        )}
+
+        {openMenu === 'Help' && (
+          <StandardMenuDropdown menuId="Help">
+            <MenuItemDisabled label="RahulOS Help" />
+            <MenuSeparator />
             <MenuItem
-              label="Sleep"
-              onClick={() => {
-                // eslint-disable-next-line no-console
-                console.log('RahulOS is sleeping... Sweet dreams!');
-                setMenuOpen(false);
-              }}
+              label="About RahulOS"
+              onClick={() => { openModal('about'); closeMenu(); }}
             />
-          </div>
+          </StandardMenuDropdown>
         )}
       </div>
 
@@ -164,37 +253,231 @@ export function MenuBar() {
         className="flex items-center"
         style={{
           height: '100%',
-          gap: '16px',
+          gap: '14px',
           color: 'var(--color-text-primary)',
         }}
       >
-        {/* Control Center: 2x2 dot grid */}
         <ControlCenterIcon />
-
-        {/* Wi-Fi icon */}
         <WifiIcon />
-
-        {/* Battery icon + percentage */}
-        <div className="flex items-center" style={{ gap: '5px' }}>
+        <div className="flex items-center" style={{ gap: '4px' }}>
           <BatteryIcon />
-          <span style={{ fontSize: '12px', fontWeight: 400 }}>100%</span>
+          <span style={{ fontSize: '11.5px', fontWeight: 400 }}>100%</span>
         </div>
-
-        {/* Date and Time */}
-        <div className="flex items-center" style={{ gap: '6px' }}>
+        <div className="flex items-center" style={{ gap: '6px', fontSize: '12.5px' }}>
           <span style={{ fontWeight: 400 }}>{dateStr}</span>
-          <span style={{ fontWeight: 600 }}>{formatted}</span>
+          <span style={{ fontWeight: 500 }}>{formatted}</span>
         </div>
       </div>
     </div>
   );
 }
 
+// --- Subcomponents ---
+
+function MenuBarButton({
+  children,
+  bold,
+  isOpen,
+  onClick,
+  onMouseEnter,
+}: {
+  children: React.ReactNode;
+  bold?: boolean;
+  isOpen: boolean;
+  onClick: () => void;
+  onMouseEnter: () => void;
+}) {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <button
+      className="flex items-center border-none cursor-default"
+      style={{
+        height: '100%',
+        padding: '0 10px',
+        background: isOpen ? 'var(--color-bg-active)' : hovered ? 'var(--color-bg-hover)' : 'transparent',
+        borderRadius: '3px',
+        color: 'var(--color-text-primary)',
+        fontFamily: 'var(--font-system)',
+        fontSize: '13px',
+        fontWeight: bold ? 600 : 400,
+        lineHeight: 1,
+        transition: 'background 60ms ease',
+      }}
+      onClick={onClick}
+      onMouseEnter={() => { setHovered(true); onMouseEnter(); }}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {children}
+    </button>
+  );
+}
+
+function MenuDropdown({ children, left }: { children: React.ReactNode; left: number }) {
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        top: 'var(--menubar-height)',
+        left,
+        width: 200,
+        background: 'var(--color-bg-surface)',
+        backdropFilter: 'blur(40px) saturate(1.8)',
+        WebkitBackdropFilter: 'blur(40px) saturate(1.8)',
+        borderRadius: 'var(--radius-context-menu)',
+        border: '0.5px solid var(--color-border-active)',
+        boxShadow: 'var(--shadow-context-menu)',
+        padding: '4px 0',
+        zIndex: 9999,
+        animation: 'menuDropIn 80ms ease-out',
+      }}
+    >
+      {children}
+      <style>{`
+        @keyframes menuDropIn {
+          from { opacity: 0; transform: translateY(-2px) scale(0.98); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+function StandardMenuDropdown({ menuId, children }: { menuId: string; children: React.ReactNode }) {
+  const buttonRef = useMenuBarButtonRef(menuId);
+  const left = buttonRef ?? 0;
+
+  return <MenuDropdown left={left}>{children}</MenuDropdown>;
+}
+
+function AppMenuDropdown({
+  appName,
+  onClose,
+  openModal,
+}: {
+  appName: string;
+  onClose: () => void;
+  openModal: (modal: 'about' | null) => void;
+}) {
+  const buttonRef = useMenuBarButtonRef('app');
+  const left = buttonRef ?? 0;
+
+  return (
+    <MenuDropdown left={left}>
+      <MenuItem
+        label={`About ${appName}`}
+        onClick={() => { openModal('about'); onClose(); }}
+      />
+      <MenuSeparator />
+      <MenuItemDisabled label={`Hide ${appName}`} shortcut="&#8984;H" />
+      <MenuItemDisabled label="Hide Others" shortcut="&#8997;&#8984;H" />
+      <MenuItem label="Show All" onClick={onClose} />
+      <MenuSeparator />
+      <MenuItem
+        label={`Quit ${appName}`}
+        shortcut="&#8984;Q"
+        onClick={onClose}
+      />
+    </MenuDropdown>
+  );
+}
+
+/** Calculates the left offset of a menu bar button by its id/label for dropdown positioning */
+function useMenuBarButtonRef(menuId: string): number | null {
+  const [left, setLeft] = useState<number | null>(null);
+
+  useEffect(() => {
+    // Find the button in the menu bar by matching text content or data attribute
+    const menuBar = document.querySelector('[data-menubar]');
+    if (!menuBar) return;
+    const buttons = menuBar.querySelectorAll<HTMLButtonElement>('button');
+    // Map: apple=0, app=1, File=2, Edit=3, View=4, Window=5, Help=6
+    const order = ['apple', 'app', 'File', 'Edit', 'View', 'Window', 'Help'];
+    const idx = order.indexOf(menuId);
+    if (idx >= 0 && buttons[idx]) {
+      const rect = buttons[idx].getBoundingClientRect();
+      const parentRect = menuBar.getBoundingClientRect();
+      setLeft(rect.left - parentRect.left);
+    }
+  }, [menuId]);
+
+  return left;
+}
+
+function MenuItem({ label, shortcut, onClick }: { label: string; shortcut?: string; onClick: () => void }) {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <button
+      className="w-full text-left"
+      style={{
+        color: hovered ? '#ffffff' : 'var(--color-text-primary)',
+        background: hovered ? 'var(--color-accent)' : 'transparent',
+        borderRadius: hovered ? 4 : 0,
+        margin: hovered ? '0 4px' : 0,
+        width: hovered ? 'calc(100% - 8px)' : '100%',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        border: 'none',
+        cursor: 'default',
+        fontFamily: 'var(--font-system)',
+        fontSize: '13px',
+        lineHeight: '20px',
+        padding: '3px 12px',
+      }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onClick={onClick}
+    >
+      <span>{label}</span>
+      {shortcut && (
+        <span style={{ fontSize: '12px', opacity: hovered ? 0.8 : 0.5, marginLeft: '16px' }}>
+          {shortcut}
+        </span>
+      )}
+    </button>
+  );
+}
+
+function MenuItemDisabled({ label, shortcut }: { label: string; shortcut?: string }) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        fontFamily: 'var(--font-system)',
+        fontSize: '13px',
+        lineHeight: '20px',
+        padding: '3px 12px',
+        color: 'var(--color-text-tertiary)',
+        cursor: 'default',
+      }}
+    >
+      <span>{label}</span>
+      {shortcut && (
+        <span style={{ fontSize: '12px', opacity: 0.5, marginLeft: '16px' }}>
+          {shortcut}
+        </span>
+      )}
+    </div>
+  );
+}
+
+function MenuSeparator() {
+  return (
+    <div style={{ height: 1, background: 'var(--color-border)', margin: '4px 8px' }} />
+  );
+}
+
+// --- Icons ---
+
 function AppleIcon() {
   return (
     <svg
-      width="13"
-      height="15"
+      width="12"
+      height="14"
       viewBox="0 0 17 20"
       fill="currentColor"
       style={{ display: 'block' }}
@@ -207,16 +490,16 @@ function AppleIcon() {
 function ControlCenterIcon() {
   return (
     <svg
-      width="15"
-      height="15"
+      width="14"
+      height="14"
       viewBox="0 0 16 16"
       fill="currentColor"
-      style={{ display: 'block', opacity: 0.9 }}
+      style={{ display: 'block', opacity: 0.85 }}
     >
-      <circle cx="5" cy="5" r="2.4" />
-      <circle cx="11" cy="5" r="2.4" />
-      <circle cx="5" cy="11" r="2.4" />
-      <circle cx="11" cy="11" r="2.4" />
+      <circle cx="5" cy="5" r="2.2" />
+      <circle cx="11" cy="5" r="2.2" />
+      <circle cx="5" cy="11" r="2.2" />
+      <circle cx="11" cy="11" r="2.2" />
     </svg>
   );
 }
@@ -224,15 +507,15 @@ function ControlCenterIcon() {
 function WifiIcon() {
   return (
     <svg
-      width="15"
-      height="15"
+      width="14"
+      height="14"
       viewBox="0 0 20 20"
       fill="none"
       stroke="currentColor"
       strokeWidth="1.8"
       strokeLinecap="round"
       strokeLinejoin="round"
-      style={{ display: 'block', opacity: 0.9 }}
+      style={{ display: 'block', opacity: 0.85 }}
     >
       <path d="M1.5 7.5a13 13 0 0 1 17 0" />
       <path d="M5 11a8.5 8.5 0 0 1 10 0" />
@@ -245,13 +528,12 @@ function WifiIcon() {
 function BatteryIcon() {
   return (
     <svg
-      width="22"
-      height="11"
+      width="20"
+      height="10"
       viewBox="0 0 25 12"
       fill="none"
-      style={{ display: 'block', opacity: 0.9 }}
+      style={{ display: 'block', opacity: 0.85 }}
     >
-      {/* Battery body outline */}
       <rect
         x="0.5"
         y="0.5"
@@ -261,17 +543,15 @@ function BatteryIcon() {
         stroke="currentColor"
         strokeWidth="1"
       />
-      {/* Fill (100%) */}
       <rect
         x="2"
         y="2"
         width="17"
         height="8"
         rx="1.2"
-        fill="currentColor"
-        opacity="0.85"
+        fill="#32D74B"
+        opacity="0.9"
       />
-      {/* Battery nub */}
       <path
         d="M22 4a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1"
         stroke="currentColor"
@@ -279,34 +559,5 @@ function BatteryIcon() {
         fill="none"
       />
     </svg>
-  );
-}
-
-function MenuItem({ label, onClick }: { label: string; onClick: () => void }) {
-  const [hovered, setHovered] = useState(false);
-
-  return (
-    <button
-      className="w-full text-left"
-      style={{
-        color: 'var(--color-text-primary)',
-        background: hovered ? 'rgba(59, 130, 246, 0.7)' : 'transparent',
-        borderRadius: hovered ? 4 : 0,
-        margin: hovered ? '0 4px' : 0,
-        width: hovered ? 'calc(100% - 8px)' : '100%',
-        display: 'block',
-        border: 'none',
-        cursor: 'default',
-        fontFamily: 'var(--font-system)',
-        fontSize: '13px',
-        lineHeight: '20px',
-        padding: '2px 10px',
-      }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      onClick={onClick}
-    >
-      {label}
-    </button>
   );
 }

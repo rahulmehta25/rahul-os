@@ -12,13 +12,17 @@ interface ContextMenuState {
 }
 
 export function FileManager() {
-  const [currentPath, setCurrentPath] = useState('/home/rahul');
+  const [navState, setNavState] = useState({ history: ['/home/rahul'], index: 0 });
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [selectedName, setSelectedName] = useState<string | null>(null);
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
   const [renaming, setRenaming] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState('');
   const renameInputRef = useRef<HTMLInputElement>(null);
+
+  const currentPath = navState.history[navState.index];
+  const canGoBack = navState.index > 0;
+  const canGoForward = navState.index < navState.history.length - 1;
 
   const listDirectory = useFilesystemStore((s) => s.listDirectory);
   const createFile = useFilesystemStore((s) => s.createFile);
@@ -31,22 +35,33 @@ export function FileManager() {
   const items = listDirectory(currentPath) ?? [];
   void root;
 
-  const breadcrumbs = currentPath === '/' ? ['/'] : currentPath.split('/').filter(Boolean);
+  const breadcrumbs = currentPath === '/' ? [] : currentPath.split('/').filter(Boolean);
 
   const navigateTo = useCallback((path: string) => {
-    setCurrentPath(path);
+    setNavState((prev) => ({
+      history: [...prev.history.slice(0, prev.index + 1), path],
+      index: prev.index + 1,
+    }));
     setSelectedName(null);
     setContextMenu(null);
   }, []);
 
+  const goBack = useCallback(() => {
+    setNavState((prev) => (prev.index > 0 ? { ...prev, index: prev.index - 1 } : prev));
+    setSelectedName(null);
+  }, []);
+
+  const goForward = useCallback(() => {
+    setNavState((prev) =>
+      prev.index < prev.history.length - 1 ? { ...prev, index: prev.index + 1 } : prev,
+    );
+    setSelectedName(null);
+  }, []);
+
   const handleBreadcrumbClick = useCallback(
     (index: number) => {
-      if (index < 0) {
-        navigateTo('/');
-      } else {
-        const path = '/' + breadcrumbs.slice(0, index + 1).join('/');
-        navigateTo(path);
-      }
+      const path = index < 0 ? '/' : '/' + breadcrumbs.slice(0, index + 1).join('/');
+      navigateTo(path);
     },
     [breadcrumbs, navigateTo],
   );
@@ -54,11 +69,9 @@ export function FileManager() {
   const handleOpen = useCallback(
     (node: FSNode) => {
       if (node.type === 'directory') {
-        const newPath = currentPath === '/' ? `/${node.name}` : `${currentPath}/${node.name}`;
-        navigateTo(newPath);
+        navigateTo(currentPath === '/' ? `/${node.name}` : `${currentPath}/${node.name}`);
         return;
       }
-
       const ext = node.name.split('.').pop()?.toLowerCase() ?? '';
       const filePath = currentPath === '/' ? `/${node.name}` : `${currentPath}/${node.name}`;
 
@@ -68,17 +81,14 @@ export function FileManager() {
         if (url) window.open(url, '_blank', 'noopener');
         return;
       }
-
       if (ext === 'pdf') {
         window.open('https://rahul-mehta.me/resume', '_blank', 'noopener');
         return;
       }
-
       if (ext === 'app') {
         openWindow('snake', 'Snake', { size: { width: 400, height: 440 } });
         return;
       }
-
       openWindow('texteditor', node.name, {
         size: { width: 700, height: 500 },
         appProps: { filePath },
@@ -94,24 +104,18 @@ export function FileManager() {
     setContextMenu({ x: e.clientX, y: e.clientY, target: node });
   }, []);
 
-  const handleBgContextMenu = useCallback(
-    (e: React.MouseEvent) => {
-      e.preventDefault();
-      if ((e.target as HTMLElement).closest('[data-file-item]')) return;
-      setContextMenu({ x: e.clientX, y: e.clientY, target: null });
-    },
-    [],
-  );
+  const handleBgContextMenu = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    if ((e.target as HTMLElement).closest('[data-file-item]')) return;
+    setContextMenu({ x: e.clientX, y: e.clientY, target: null });
+  }, []);
 
   const handleNewFile = useCallback(() => {
     let name = 'untitled.txt';
     let i = 1;
     const names = new Set(items.map((n) => n.name));
-    while (names.has(name)) {
-      name = `untitled-${i++}.txt`;
-    }
-    const path = currentPath === '/' ? `/${name}` : `${currentPath}/${name}`;
-    createFile(path, '');
+    while (names.has(name)) name = `untitled-${i++}.txt`;
+    createFile(currentPath === '/' ? `/${name}` : `${currentPath}/${name}`, '');
     setContextMenu(null);
     setRenaming(name);
     setRenameValue(name);
@@ -121,11 +125,8 @@ export function FileManager() {
     let name = 'New Folder';
     let i = 1;
     const names = new Set(items.map((n) => n.name));
-    while (names.has(name)) {
-      name = `New Folder ${i++}`;
-    }
-    const path = currentPath === '/' ? `/${name}` : `${currentPath}/${name}`;
-    createDirectory(path);
+    while (names.has(name)) name = `New Folder ${i++}`;
+    createDirectory(currentPath === '/' ? `/${name}` : `${currentPath}/${name}`);
     setContextMenu(null);
     setRenaming(name);
     setRenameValue(name);
@@ -133,8 +134,11 @@ export function FileManager() {
 
   const handleDelete = useCallback(() => {
     if (!contextMenu?.target) return;
-    const path = currentPath === '/' ? `/${contextMenu.target.name}` : `${currentPath}/${contextMenu.target.name}`;
-    deleteNode(path);
+    deleteNode(
+      currentPath === '/'
+        ? `/${contextMenu.target.name}`
+        : `${currentPath}/${contextMenu.target.name}`,
+    );
     setContextMenu(null);
     setSelectedName(null);
   }, [contextMenu, currentPath, deleteNode]);
@@ -151,11 +155,30 @@ export function FileManager() {
       setRenaming(null);
       return;
     }
-    const path = currentPath === '/' ? `/${renaming}` : `${currentPath}/${renaming}`;
-    renameNode(path, renameValue.trim());
+    renameNode(
+      currentPath === '/' ? `/${renaming}` : `${currentPath}/${renaming}`,
+      renameValue.trim(),
+    );
     setRenaming(null);
     setSelectedName(renameValue.trim());
   }, [renaming, renameValue, currentPath, renameNode]);
+
+  const handleDuplicate = useCallback(() => {
+    if (!contextMenu?.target || contextMenu.target.type !== 'file') return;
+    const node = contextMenu.target;
+    const dotIdx = node.name.lastIndexOf('.');
+    const baseName = dotIdx > 0 ? node.name.slice(0, dotIdx) : node.name;
+    const ext = dotIdx > 0 ? node.name.slice(dotIdx) : '';
+    let copyName = `${baseName} copy${ext}`;
+    let i = 2;
+    const names = new Set(items.map((n) => n.name));
+    while (names.has(copyName)) copyName = `${baseName} copy ${i++}${ext}`;
+    createFile(
+      currentPath === '/' ? `/${copyName}` : `${currentPath}/${copyName}`,
+      node.content,
+    );
+    setContextMenu(null);
+  }, [contextMenu, currentPath, items, createFile]);
 
   useEffect(() => {
     if (renaming && renameInputRef.current) {
@@ -180,52 +203,69 @@ export function FileManager() {
     >
       {/* Toolbar */}
       <div
-        className="flex items-center gap-2 px-3 shrink-0"
+        className="flex items-center gap-1 px-3 shrink-0"
         style={{
-          height: '36px',
+          height: '38px',
           borderBottom: '1px solid var(--color-border)',
-          background: 'var(--color-bg-hover)',
+          background: 'var(--color-bg-titlebar)',
+          backdropFilter: 'blur(20px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(20px) saturate(180%)',
         }}
       >
-        {/* Back button */}
+        {/* Back / Forward chevrons */}
         <button
-          className="rounded px-1.5 py-0.5"
           style={{
-            color: currentPath === '/' ? 'var(--color-text-tertiary)' : 'var(--color-text-secondary)',
-            fontSize: '14px',
             background: 'transparent',
+            color: canGoBack ? 'var(--color-text-secondary)' : 'var(--color-text-tertiary)',
+            fontSize: '18px',
+            cursor: canGoBack ? 'pointer' : 'default',
+            opacity: canGoBack ? 1 : 0.35,
+            padding: '0 3px',
+            lineHeight: 1,
           }}
-          disabled={currentPath === '/'}
-          onClick={() => {
-            const parent = currentPath.split('/').slice(0, -1).join('/') || '/';
-            navigateTo(parent);
-          }}
+          disabled={!canGoBack}
+          onClick={goBack}
           aria-label="Go back"
         >
-          ←
+          {'\u2039'}
+        </button>
+        <button
+          style={{
+            background: 'transparent',
+            color: canGoForward ? 'var(--color-text-secondary)' : 'var(--color-text-tertiary)',
+            fontSize: '18px',
+            cursor: canGoForward ? 'pointer' : 'default',
+            opacity: canGoForward ? 1 : 0.35,
+            padding: '0 3px',
+            lineHeight: 1,
+          }}
+          disabled={!canGoForward}
+          onClick={goForward}
+          aria-label="Go forward"
+        >
+          {'\u203A'}
         </button>
 
         {/* Breadcrumbs */}
-        <div className="flex items-center gap-0.5 flex-1 min-w-0 overflow-hidden">
+        <div className="flex items-center gap-0.5 flex-1 min-w-0 overflow-hidden ml-2">
           <button
             className="shrink-0 px-1 rounded"
-            style={{
-              fontSize: '12px',
-              color: 'var(--color-text-secondary)',
-              background: 'transparent',
-            }}
+            style={{ fontSize: '12px', color: 'var(--color-text-tertiary)', background: 'transparent' }}
             onClick={() => handleBreadcrumbClick(-1)}
           >
             /
           </button>
           {breadcrumbs.map((part, i) => (
             <span key={i} className="flex items-center gap-0.5 shrink-0">
-              <span style={{ color: 'var(--color-text-tertiary)', fontSize: '10px' }}>›</span>
+              <span style={{ color: 'var(--color-text-tertiary)', fontSize: '11px' }}>{'\u203A'}</span>
               <button
                 className="px-1 rounded truncate"
                 style={{
                   fontSize: '12px',
-                  color: i === breadcrumbs.length - 1 ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
+                  color:
+                    i === breadcrumbs.length - 1
+                      ? 'var(--color-text-primary)'
+                      : 'var(--color-text-secondary)',
                   fontWeight: i === breadcrumbs.length - 1 ? 500 : 400,
                   background: 'transparent',
                   maxWidth: '120px',
@@ -238,7 +278,7 @@ export function FileManager() {
           ))}
         </div>
 
-        {/* View mode toggle */}
+        {/* View toggle */}
         <div className="flex gap-0.5 shrink-0">
           <button
             className="rounded p-1"
@@ -250,10 +290,10 @@ export function FileManager() {
             aria-label="Grid view"
           >
             <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
-              <rect x="1" y="1" width="6" height="6" rx="1" />
-              <rect x="9" y="1" width="6" height="6" rx="1" />
-              <rect x="1" y="9" width="6" height="6" rx="1" />
-              <rect x="9" y="9" width="6" height="6" rx="1" />
+              <rect x="1" y="1" width="6" height="6" rx="1.5" />
+              <rect x="9" y="1" width="6" height="6" rx="1.5" />
+              <rect x="1" y="9" width="6" height="6" rx="1.5" />
+              <rect x="9" y="9" width="6" height="6" rx="1.5" />
             </svg>
           </button>
           <button
@@ -266,22 +306,25 @@ export function FileManager() {
             aria-label="List view"
           >
             <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
-              <rect x="1" y="2" width="14" height="2" rx="0.5" />
-              <rect x="1" y="7" width="14" height="2" rx="0.5" />
-              <rect x="1" y="12" width="14" height="2" rx="0.5" />
+              <rect x="1" y="2" width="14" height="2" rx="1" />
+              <rect x="1" y="7" width="14" height="2" rx="1" />
+              <rect x="1" y="12" width="14" height="2" rx="1" />
             </svg>
           </button>
         </div>
       </div>
 
       {/* Main area */}
-      <div className="flex flex-1 min-h-0">
+      <div className="flex flex-1 min-h-0" style={{ backgroundColor: 'var(--color-bg-surface-solid)' }}>
         <Sidebar currentPath={currentPath} onNavigate={navigateTo} />
-        <div className="flex-1 flex flex-col min-w-0 relative">
-          {renaming ? (
+        <div className="flex-1 flex flex-col min-w-0 relative" style={{ backgroundColor: 'var(--color-bg-surface-solid)' }}>
+          {renaming && (
             <div
               className="absolute top-0 left-0 right-0 z-10 px-3 py-2 flex items-center gap-2"
-              style={{ background: 'var(--color-bg-surface-solid)', borderBottom: '1px solid var(--color-border)' }}
+              style={{
+                background: 'var(--color-bg-surface-solid)',
+                borderBottom: '1px solid var(--color-border)',
+              }}
             >
               <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>Rename:</span>
               <input
@@ -303,7 +346,7 @@ export function FileManager() {
                 onBlur={handleRenameSubmit}
               />
             </div>
-          ) : null}
+          )}
           <FileGrid
             items={items}
             viewMode={viewMode}
@@ -323,24 +366,39 @@ export function FileManager() {
           style={{
             left: contextMenu.x,
             top: contextMenu.y,
-            zIndex: 'var(--z-context-menu)',
-            background: 'var(--color-bg-surface-solid)',
+            zIndex: 2000,
+            background: 'var(--color-bg-surface)',
+            backdropFilter: 'blur(20px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(20px) saturate(180%)',
             border: '1px solid var(--color-border)',
             boxShadow: 'var(--shadow-context-menu)',
-            minWidth: '160px',
+            minWidth: '180px',
           }}
           onClick={(e) => e.stopPropagation()}
         >
-          {contextMenu.target && (
+          {contextMenu.target ? (
             <>
-              <ContextMenuItem label="Open" onClick={() => { handleOpen(contextMenu.target!); setContextMenu(null); }} />
+              <ContextMenuItem
+                label="Open"
+                onClick={() => {
+                  handleOpen(contextMenu.target!);
+                  setContextMenu(null);
+                }}
+              />
+              <MenuSeparator />
               <ContextMenuItem label="Rename" onClick={handleRenameStart} />
-              <ContextMenuItem label="Delete" onClick={handleDelete} danger />
-              <div style={{ height: '1px', background: 'var(--color-border)', margin: '4px 0' }} />
+              {contextMenu.target.type === 'file' && (
+                <ContextMenuItem label="Duplicate" onClick={handleDuplicate} />
+              )}
+              <MenuSeparator />
+              <ContextMenuItem label="Move to Trash" onClick={handleDelete} danger />
+            </>
+          ) : (
+            <>
+              <ContextMenuItem label="New Folder" onClick={handleNewFolder} />
+              <ContextMenuItem label="New File" onClick={handleNewFile} />
             </>
           )}
-          <ContextMenuItem label="New Folder" onClick={handleNewFolder} />
-          <ContextMenuItem label="New File" onClick={handleNewFile} />
         </div>
       )}
 
@@ -374,19 +432,34 @@ function ContextMenuItem({
     <button
       className="w-full text-left px-3 py-1"
       style={{
-        fontSize: '12px',
-        color: danger ? 'var(--color-close)' : 'var(--color-text-primary)',
+        fontSize: '13px',
+        color: danger ? '#FF453A' : 'var(--color-text-primary)',
         background: 'transparent',
+        borderRadius: '4px',
+        margin: '0 4px',
+        width: 'calc(100% - 8px)',
       }}
       onMouseEnter={(e) => {
-        (e.currentTarget as HTMLElement).style.background = 'var(--color-accent-subtle)';
+        (e.currentTarget as HTMLElement).style.background = 'var(--color-accent)';
+        (e.currentTarget as HTMLElement).style.color = '#fff';
       }}
       onMouseLeave={(e) => {
         (e.currentTarget as HTMLElement).style.background = 'transparent';
+        (e.currentTarget as HTMLElement).style.color = danger
+          ? '#FF453A'
+          : 'var(--color-text-primary)';
       }}
       onClick={onClick}
     >
       {label}
     </button>
+  );
+}
+
+function MenuSeparator() {
+  return (
+    <div
+      style={{ height: '1px', background: 'var(--color-border)', margin: '4px 8px' }}
+    />
   );
 }

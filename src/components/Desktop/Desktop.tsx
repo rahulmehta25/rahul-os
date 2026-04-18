@@ -10,6 +10,7 @@ import { Dock } from './Dock.tsx';
 import { DesktopIcons } from './DesktopIcons.tsx';
 import { ContextMenu } from './ContextMenu.tsx';
 import { NotificationCenter } from '../Notifications/NotificationCenter.tsx';
+import { VoiceOverlay } from '../Voice/VoiceOverlay.tsx';
 import { AboutModal } from '../../apps/AboutThisComputer/About.tsx';
 import { appRegistry } from '../../apps/registry.tsx';
 import { useWindowKeyboard } from '../../hooks/useWindowKeyboard.ts';
@@ -156,6 +157,8 @@ export function Desktop() {
       <ContextMenu />
 
       <NotificationCenter />
+
+      <VoiceOverlay />
 
       {activeModal === 'about' && <AboutModal />}
     </div>

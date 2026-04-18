@@ -193,3 +193,19 @@
 - Build passes clean (TypeScript + Vite)
 
 ---
+
+## 2026-04-18 EST
+
+### User Prompt
+"Start at the first incomplete item in DELTA.md."
+
+### Actions Taken
+- Rewrote `README.md` using the voice-first draft from `DELTA.md` (item 2).
+- Added `@elevenlabs/react@^1.1.1` dependency (item 5).
+- Added `.env.example` with `VITE_ELEVENLABS_AGENT_ID` pointing at the DELTA-specified agent.
+- Created `src/components/Voice/VoiceOverlay.tsx` with a Cmd+K toggle, mic-gated WebRTC session to the ElevenLabs agent, and an `open_app` client tool that dispatches to `windowStore.openWindow` via `appRegistry`.
+- Mounted `VoiceOverlay` in `src/components/Desktop/Desktop.tsx`.
+- Logged blocked items (1, 3, 4, 6, 7, 8) to `~/Desktop/Projects/portfolio-upgrade/_logs/rahulos.scope-requests.md`.
+- `npm run build` passes clean.
+
+---

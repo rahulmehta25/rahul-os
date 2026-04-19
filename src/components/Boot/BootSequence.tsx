@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
+import { posthog } from '../../lib/posthog';
 
 const POST_LINES = [
   'RahulOS BIOS v1.0.0',
@@ -83,6 +84,8 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
   // Fade-out phase: call onComplete after fade
   useEffect(() => {
     if (phase !== 'fade-out') return;
+    const variant = posthog.getFeatureFlag?.('rahulos-boot-animation-variant') ?? 'classic';
+    posthog.capture?.('boot_animation_played', { variant });
     const timer = setTimeout(onComplete, 250);
     return () => clearTimeout(timer);
   }, [phase, onComplete]);

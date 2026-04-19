@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { ConversationProvider } from '@elevenlabs/react';
 import { useSettingsStore } from './stores/settingsStore.ts';
 import { Desktop } from './components/Desktop/Desktop.tsx';
 import { MobileFallback } from './components/Mobile/MobileFallback.tsx';
@@ -47,9 +48,9 @@ export default function App() {
   if (phase === 'login') return <LoginScreen onLogin={handleLogin} />;
 
   return (
-    <>
+    <ConversationProvider>
       <Desktop />
       <EffectsLayer />
-    </>
+    </ConversationProvider>
   );
 }

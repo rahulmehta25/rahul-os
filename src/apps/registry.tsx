@@ -40,6 +40,10 @@ const LazyBrowser = lazy(() =>
   import('./Browser/Browser').then((m) => ({ default: m.Browser })),
 );
 
+const LazyVisitorBoard = lazy(() =>
+  import('./VisitorBoard/VisitorBoard').then((m) => ({ default: m.VisitorBoard })),
+);
+
 export const appRegistry: Record<string, AppManifest> = {
   terminal: {
     id: 'terminal',
@@ -110,5 +114,15 @@ export const appRegistry: Record<string, AppManifest> = {
     allowMultiple: true,
     showInDock: true,
     showOnDesktop: false,
+  },
+  visitorboard: {
+    id: 'visitorboard',
+    name: 'Visitor Board',
+    component: LazyVisitorBoard,
+    defaultSize: { width: 640, height: 480 },
+    minSize: { width: 420, height: 320 },
+    allowMultiple: false,
+    showInDock: true,
+    showOnDesktop: true,
   },
 };

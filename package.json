@@ -16,6 +16,8 @@
     "@codemirror/state": "^6.6.0",
     "@codemirror/view": "^6.40.0",
     "@elevenlabs/react": "^1.1.1",
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "zustand": "^5.0.12"

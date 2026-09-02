@@ -1,433 +1,47 @@
 import { useState, useCallback, useRef } from 'react';
 
-interface ProjectCard {
+interface Favorite {
   name: string;
   url: string;
-  description: string;
-  stack: string[];
-  color: string;
-  gradient: string;
-  featured?: boolean;
-  tagline?: string;
-  mockElements?: 'portfolio' | 'dashboard' | 'landing' | 'app' | 'tool' | 'os';
+  note: string;
 }
 
-const PROJECTS: ProjectCard[] = [
+const FAVORITES: Favorite[] = [
   {
     name: 'Portfolio',
     url: 'https://rahul-mehta.me',
-    description:
-      'Personal portfolio with project showcases, AI chatbot, and Easter eggs. The traditional way to see my work.',
-    stack: ['React', 'Vercel', 'OpenRouter'],
-    color: '#74c7ec',
-    gradient: 'linear-gradient(135deg, #0c1929 0%, #1a3a5c 30%, #2563eb 70%, #60a5fa 100%)',
-    featured: true,
-    tagline: 'Startup Founder | AI/ML Engineer | GT 2027',
-    mockElements: 'portfolio',
+    note: 'Projects, writing, and contact.',
   },
   {
     name: 'Osmoti',
     url: 'https://osmoti.com',
-    description:
-      'B2B SaaS platform for ad performance management and optimization. Multi-tenant architecture with AI-powered insights.',
-    stack: ['Next.js', 'TypeScript', 'Prisma', 'AWS', 'Anthropic'],
-    color: '#89b4fa',
-    gradient: 'linear-gradient(135deg, #0f1a2e 0%, #1e3a5f 40%, #3b82f6 80%, #93c5fd 100%)',
-    mockElements: 'dashboard',
+    note: 'Ad performance platform.',
   },
   {
     name: 'Keep Safe',
     url: 'https://beachbox.co',
-    description:
-      'Hotel tech product: smart safe + speaker + charger + AI digital concierge. Secured $100K hotel partnership.',
-    stack: ['React', 'Firebase', 'OpenAI', 'RAG'],
-    color: '#a6e3a1',
-    gradient: 'linear-gradient(135deg, #0a1f12 0%, #1a4731 40%, #22c55e 80%, #86efac 100%)',
-    mockElements: 'landing',
+    note: 'Hotel safe, speaker, and concierge.',
   },
   {
     name: 'Analytics Pro',
     url: 'https://analytics-pro-frontend.vercel.app',
-    description:
-      'Marketing analytics with AI-powered natural language querying. Ask questions in plain English, get SQL-backed answers.',
-    stack: ['FastAPI', 'BigQuery', 'Vertex AI', 'Next.js'],
-    color: '#f9e2af',
-    gradient: 'linear-gradient(135deg, #1a1505 0%, #4a3a0a 30%, #eab308 70%, #fde68a 100%)',
-    mockElements: 'dashboard',
+    note: 'Ask marketing data in plain English.',
   },
   {
     name: 'RahulOS',
     url: 'https://os.rahul-mehta.me',
-    description:
-      "You're using it right now. A browser-based desktop OS built as a creative portfolio piece.",
-    stack: ['React 19', 'Zustand', 'Vite', 'Tailwind 4'],
-    color: '#cba6f7',
-    gradient: 'linear-gradient(135deg, #1a0f2e 0%, #3b1f6e 40%, #8b5cf6 80%, #c4b5fd 100%)',
-    mockElements: 'os',
+    note: 'This desktop, in a browser.',
   },
   {
     name: 'Screenshot Reviewer',
     url: 'https://github.com/rahulmehta25/File-Reviewer',
-    description:
-      'Native macOS SwiftUI app for reviewing and cleaning screenshots. Keyboard-driven keep/delete workflow with OCR categorization.',
-    stack: ['Swift', 'SwiftUI', 'Vision', 'macOS'],
-    color: '#f38ba8',
-    gradient: 'linear-gradient(135deg, #2a0f1a 0%, #5c1a35 40%, #e11d48 80%, #fda4af 100%)',
-    mockElements: 'tool',
+    note: 'macOS screenshot review app.',
   },
 ];
 
-/* ── Mock screenshot internals ── */
-
-function MockNavbar({ color, type }: { color: string; type: string }) {
-  return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '8px',
-        padding: '6px 10px',
-        background: 'rgba(0,0,0,0.35)',
-        borderBottom: '1px solid rgba(255,255,255,0.06)',
-      }}
-    >
-      <div style={{ width: '14px', height: '14px', borderRadius: '3px', background: `${color}40` }} />
-      <div style={{ flex: 1, display: 'flex', gap: '12px' }}>
-        {(type === 'portfolio'
-          ? ['About', 'Projects', 'Contact']
-          : type === 'dashboard'
-            ? ['Overview', 'Analytics', 'Settings']
-            : type === 'landing'
-              ? ['Home', 'Features', 'Pricing']
-              : type === 'os'
-                ? ['File', 'Edit', 'View']
-                : ['Home', 'Docs', 'GitHub']
-        ).map((label) => (
-          <div
-            key={label}
-            style={{
-              fontSize: '7px',
-              color: 'rgba(255,255,255,0.4)',
-              fontFamily: 'var(--font-system)',
-              letterSpacing: '0.3px',
-            }}
-          >
-            {label}
-          </div>
-        ))}
-      </div>
-      <div style={{ width: '40px', height: '10px', borderRadius: '5px', background: 'rgba(255,255,255,0.08)' }} />
-    </div>
-  );
+function hostname(url: string) {
+  return url.replace(/^https?:\/\//, '');
 }
-
-function MockScreenshot({ project }: { project: ProjectCard }) {
-  const c = project.color;
-  const type = project.mockElements || 'app';
-
-  if (type === 'portfolio') {
-    return (
-      <div style={{ padding: '12px 14px' }}>
-        <MockNavbar color={c} type={type} />
-        <div style={{ marginTop: '10px' }}>
-          <div style={{ width: '30%', height: '7px', borderRadius: '3px', background: `${c}60`, marginBottom: '6px' }} />
-          <div style={{ width: '55%', height: '12px', borderRadius: '3px', background: 'rgba(255,255,255,0.25)', marginBottom: '4px' }} />
-          <div style={{ width: '70%', height: '5px', borderRadius: '2px', background: 'rgba(255,255,255,0.1)', marginBottom: '3px' }} />
-          <div style={{ width: '50%', height: '5px', borderRadius: '2px', background: 'rgba(255,255,255,0.1)', marginBottom: '10px' }} />
-          <div style={{ display: 'flex', gap: '6px' }}>
-            <div style={{ width: '52px', height: '18px', borderRadius: '9px', background: `${c}35`, border: `1px solid ${c}50` }} />
-            <div style={{ width: '52px', height: '18px', borderRadius: '9px', background: 'rgba(255,255,255,0.06)' }} />
-          </div>
-          <div style={{ display: 'flex', gap: '6px', marginTop: '12px' }}>
-            {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                style={{
-                  flex: 1,
-                  height: '32px',
-                  borderRadius: '6px',
-                  background: `${c}${10 + i * 5}`,
-                  border: `1px solid ${c}20`,
-                }}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (type === 'dashboard') {
-    return (
-      <div style={{ padding: '12px 14px' }}>
-        <MockNavbar color={c} type={type} />
-        <div style={{ display: 'flex', gap: '6px', marginTop: '10px' }}>
-          {/* Sidebar */}
-          <div style={{ width: '50px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            {[1, 2, 3, 4].map((i) => (
-              <div
-                key={i}
-                style={{
-                  height: '6px',
-                  borderRadius: '3px',
-                  background: i === 1 ? `${c}40` : 'rgba(255,255,255,0.06)',
-                  width: i === 1 ? '100%' : `${60 + i * 8}%`,
-                }}
-              />
-            ))}
-          </div>
-          {/* Main content */}
-          <div style={{ flex: 1 }}>
-            <div style={{ display: 'flex', gap: '4px', marginBottom: '8px' }}>
-              {[1, 2, 3].map((i) => (
-                <div
-                  key={i}
-                  style={{
-                    flex: 1,
-                    height: '24px',
-                    borderRadius: '4px',
-                    background: `${c}${8 + i * 6}`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <div style={{ width: '60%', height: '4px', borderRadius: '2px', background: `${c}40` }} />
-                </div>
-              ))}
-            </div>
-            {/* Chart area */}
-            <div
-              style={{
-                height: '30px',
-                borderRadius: '4px',
-                background: 'rgba(255,255,255,0.04)',
-                display: 'flex',
-                alignItems: 'flex-end',
-                gap: '2px',
-                padding: '4px 6px',
-              }}
-            >
-              {[40, 65, 45, 80, 55, 70, 90, 60, 75, 50].map((h, i) => (
-                <div
-                  key={i}
-                  style={{
-                    flex: 1,
-                    height: `${h}%`,
-                    borderRadius: '1px',
-                    background: `${c}${30 + Math.floor(h / 3)}`,
-                  }}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (type === 'landing') {
-    return (
-      <div style={{ padding: '12px 14px' }}>
-        <MockNavbar color={c} type={type} />
-        <div style={{ marginTop: '10px', textAlign: 'center' as const }}>
-          <div style={{ width: '60%', height: '9px', borderRadius: '4px', background: 'rgba(255,255,255,0.2)', margin: '0 auto 5px' }} />
-          <div style={{ width: '75%', height: '5px', borderRadius: '2px', background: 'rgba(255,255,255,0.08)', margin: '0 auto 4px' }} />
-          <div style={{ width: '55%', height: '5px', borderRadius: '2px', background: 'rgba(255,255,255,0.08)', margin: '0 auto 10px' }} />
-          <div style={{ width: '70px', height: '16px', borderRadius: '8px', background: `${c}35`, border: `1px solid ${c}45`, margin: '0 auto 12px' }} />
-          <div style={{ display: 'flex', gap: '6px' }}>
-            {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                style={{
-                  flex: 1,
-                  height: '36px',
-                  borderRadius: '6px',
-                  background: 'rgba(255,255,255,0.04)',
-                  border: '1px solid rgba(255,255,255,0.06)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '3px',
-                }}
-              >
-                <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: `${c}25` }} />
-                <div style={{ width: '50%', height: '3px', borderRadius: '1px', background: 'rgba(255,255,255,0.1)' }} />
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (type === 'os') {
-    return (
-      <div style={{ padding: '12px 14px' }}>
-        <div
-          style={{
-            height: '10px',
-            background: 'rgba(255,255,255,0.08)',
-            borderRadius: '2px 2px 0 0',
-            display: 'flex',
-            alignItems: 'center',
-            padding: '0 6px',
-            gap: '3px',
-          }}
-        >
-          <div style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#ff5f57' }} />
-          <div style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#febc2e' }} />
-          <div style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#28c840' }} />
-          <div style={{ flex: 1 }} />
-          <div style={{ width: '30px', height: '3px', borderRadius: '2px', background: 'rgba(255,255,255,0.1)' }} />
-        </div>
-        <div
-          style={{
-            background: 'rgba(0,0,0,0.3)',
-            borderRadius: '0 0 4px 4px',
-            padding: '6px',
-            display: 'flex',
-            gap: '4px',
-          }}
-        >
-          {/* Mini windows */}
-          <div style={{ flex: 2, height: '50px', borderRadius: '3px', background: `${c}15`, border: `1px solid ${c}20` }}>
-            <div style={{ height: '8px', background: `${c}10`, borderRadius: '3px 3px 0 0' }} />
-          </div>
-          <div style={{ flex: 1, height: '50px', borderRadius: '3px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
-            <div style={{ height: '8px', background: 'rgba(255,255,255,0.04)', borderRadius: '3px 3px 0 0' }} />
-          </div>
-        </div>
-        {/* Dock */}
-        <div
-          style={{
-            marginTop: '6px',
-            display: 'flex',
-            justifyContent: 'center',
-            gap: '4px',
-          }}
-        >
-          {[c, '#89b4fa', '#a6e3a1', '#f9e2af'].map((col, i) => (
-            <div key={i} style={{ width: '10px', height: '10px', borderRadius: '3px', background: `${col}40` }} />
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  // tool / app fallback
-  return (
-    <div style={{ padding: '12px 14px' }}>
-      <MockNavbar color={c} type={type} />
-      <div style={{ marginTop: '10px' }}>
-        <div style={{ display: 'flex', gap: '6px', marginBottom: '8px' }}>
-          <div style={{ width: '50px', height: '50px', borderRadius: '10px', background: `${c}20`, border: `1px solid ${c}30`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={{ width: '20px', height: '20px', borderRadius: '4px', background: `${c}40` }} />
-          </div>
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '4px' }}>
-            <div style={{ width: '60%', height: '7px', borderRadius: '3px', background: 'rgba(255,255,255,0.2)' }} />
-            <div style={{ width: '80%', height: '4px', borderRadius: '2px', background: 'rgba(255,255,255,0.08)' }} />
-          </div>
-        </div>
-        <div style={{ display: 'flex', gap: '4px' }}>
-          {[1, 2].map((i) => (
-            <div
-              key={i}
-              style={{
-                flex: 1,
-                height: '20px',
-                borderRadius: '4px',
-                background: i === 1 ? `${c}20` : 'rgba(255,255,255,0.04)',
-                border: `1px solid ${i === 1 ? `${c}30` : 'rgba(255,255,255,0.06)'}`,
-              }}
-            />
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ── Card preview with mini Safari chrome ── */
-
-function PreviewContent({ project }: { project: ProjectCard }) {
-  const height = project.featured ? 220 : 164;
-  return (
-    <div
-      style={{
-        position: 'relative',
-        height: `${height}px`,
-        background: project.gradient,
-        overflow: 'hidden',
-      }}
-    >
-      {/* Mini Safari chrome */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '6px',
-          padding: '0 10px',
-          height: '24px',
-          background: 'rgba(0,0,0,0.45)',
-          backdropFilter: 'blur(8px)',
-          borderBottom: '1px solid rgba(255,255,255,0.06)',
-        }}
-      >
-        <div style={{ display: 'flex', gap: '4px' }}>
-          <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#ff5f57' }} />
-          <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#febc2e' }} />
-          <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#28c840' }} />
-        </div>
-        <div
-          style={{
-            flex: 1,
-            height: '14px',
-            borderRadius: '4px',
-            background: 'rgba(255,255,255,0.08)',
-            display: 'flex',
-            alignItems: 'center',
-            padding: '0 6px',
-            gap: '3px',
-          }}
-        >
-          <span style={{ fontSize: '7px', opacity: 0.5 }}>🔒</span>
-          <span
-            style={{
-              fontSize: '8px',
-              color: 'rgba(255,255,255,0.45)',
-              fontFamily: 'var(--font-system)',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {project.url.replace('https://', '')}
-          </span>
-        </div>
-      </div>
-
-      {/* Mock screenshot content */}
-      <MockScreenshot project={project} />
-
-      {/* Bottom gradient fade */}
-      <div
-        style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: '50px',
-          background: 'linear-gradient(transparent, var(--color-bg-surface-solid))',
-          pointerEvents: 'none',
-        }}
-      />
-    </div>
-  );
-}
-
-/* ── Main Browser component ── */
 
 export function Browser() {
   const [addressValue, setAddressValue] = useState('');
@@ -451,12 +65,8 @@ export function Browser() {
     window.open(url, '_blank', 'noopener');
   }, []);
 
-  const featured = PROJECTS.filter((p) => p.featured);
-  const regular = PROJECTS.filter((p) => !p.featured);
-
   return (
     <div className="flex flex-col h-full" style={{ fontFamily: 'var(--font-system)' }}>
-      {/* Browser toolbar */}
       <div
         style={{
           display: 'flex',
@@ -465,15 +75,15 @@ export function Browser() {
           padding: '0 14px',
           height: '32px',
           background: 'var(--color-bg-titlebar)',
-          backdropFilter: 'saturate(180%) blur(20px)',
-          WebkitBackdropFilter: 'saturate(180%) blur(20px)',
+          backdropFilter: 'var(--glass-blur)',
+          WebkitBackdropFilter: 'var(--glass-blur)',
           borderBottom: '0.5px solid var(--color-border)',
           flexShrink: 0,
         }}
       >
-        {/* Navigation arrows */}
         <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
           <button
+            type="button"
             style={{
               width: '24px',
               height: '24px',
@@ -491,6 +101,7 @@ export function Browser() {
             ‹
           </button>
           <button
+            type="button"
             style={{
               width: '24px',
               height: '24px',
@@ -509,7 +120,6 @@ export function Browser() {
           </button>
         </div>
 
-        {/* Address bar pill */}
         <form onSubmit={handleAddressSubmit} style={{ flex: 1 }}>
           <div
             style={{
@@ -518,19 +128,16 @@ export function Browser() {
               borderRadius: '8px',
               background: 'var(--color-bg-input)',
               border: addressFocused
-                ? '1px solid var(--color-accent)'
+                ? '1px solid var(--color-border-active)'
                 : '1px solid transparent',
-              boxShadow: addressFocused
-                ? '0 0 0 3px rgba(10, 132, 255, 0.15)'
-                : 'none',
-              transition: 'border-color 150ms, box-shadow 150ms',
+              transition: 'border-color 150ms',
               display: 'flex',
               alignItems: 'center',
               padding: '0 10px',
               gap: '6px',
             }}
           >
-            <span style={{ fontSize: '11px', opacity: 0.5, flexShrink: 0 }}>🔒</span>
+            <span style={{ fontSize: '11px', opacity: 0.45, flexShrink: 0 }}>🔒</span>
             <input
               ref={addressRef}
               style={{
@@ -538,7 +145,7 @@ export function Browser() {
                 background: 'transparent',
                 border: 'none',
                 outline: 'none',
-                fontSize: '13px',
+                fontSize: 'var(--text-md)',
                 color: 'var(--color-text-primary)',
                 fontFamily: 'var(--font-system)',
               }}
@@ -553,226 +160,108 @@ export function Browser() {
             />
           </div>
         </form>
-
-        {/* Share / tabs buttons */}
-        <div style={{ display: 'flex', gap: '4px', flexShrink: 0 }}>
-          <button
-            style={{
-              width: '24px',
-              height: '24px',
-              borderRadius: '4px',
-              border: 'none',
-              background: 'transparent',
-              color: 'var(--color-text-tertiary)',
-              fontSize: '12px',
-              cursor: 'default',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            ⬆
-          </button>
-          <button
-            style={{
-              width: '24px',
-              height: '24px',
-              borderRadius: '4px',
-              border: 'none',
-              background: 'transparent',
-              color: 'var(--color-text-tertiary)',
-              fontSize: '12px',
-              cursor: 'default',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            ⊞
-          </button>
-        </div>
       </div>
 
-      {/* Start page content */}
       <div
         className="flex-1 overflow-y-auto"
-        style={{ padding: '36px 32px 40px', background: 'transparent' }}
+        style={{
+          padding: '40px 36px 48px',
+          background: 'var(--color-bg-surface-solid)',
+        }}
       >
-        <div style={{ maxWidth: '860px', margin: '0 auto' }}>
-          <h2 className="label-quiet" style={{ marginBottom: '18px', paddingLeft: '2px' }}>
+        <div style={{ maxWidth: '640px', margin: '0 auto' }}>
+          <h2 className="label-quiet" style={{ marginBottom: '22px', paddingLeft: '4px' }}>
             Favorites
           </h2>
 
-          {/* Featured portfolio card (full width) */}
-          {featured.map((project) => (
-            <div
-              key={project.name}
-              onClick={() => handleVisit(project.url)}
-              style={{
-                borderRadius: '12px',
-                overflow: 'hidden',
-                background: 'var(--color-bg-hover)',
-                border: '0.5px solid var(--color-border)',
-                boxShadow: 'none',
-                cursor: 'pointer',
-                marginBottom: '20px',
-                transition: 'border-color 180ms ease, box-shadow 180ms ease',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.boxShadow = 'var(--shadow-window)';
-                e.currentTarget.style.borderColor = 'var(--color-border-active)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.boxShadow = 'none';
-                e.currentTarget.style.borderColor = 'var(--color-border)';
-              }}
-            >
-              <PreviewContent project={project} />
-              <div style={{ padding: '16px 18px 18px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
-                  <h3
-                    style={{
-                      fontSize: '18px',
-                      fontWeight: 500,
-                      letterSpacing: 'var(--tracking-tight)',
-                      color: 'var(--color-text-primary)',
-                      margin: 0,
-                    }}
-                  >
-                    {project.name}
-                  </h3>
-                  <span
-                    style={{
-                      fontSize: '11px',
-                      color: 'var(--color-text-tertiary)',
-                      fontFamily: 'var(--font-mono)',
-                    }}
-                  >
-                    {project.url.replace('https://', '')}
-                  </span>
-                </div>
-                {project.tagline && (
-                  <p
-                    style={{
-                      fontSize: '13px',
-                      color: 'var(--color-text-secondary)',
-                      fontWeight: 400,
-                      marginBottom: '6px',
-                    }}
-                  >
-                    {project.tagline}
-                  </p>
-                )}
-                <p
-                  style={{
-                    fontSize: '13px',
-                    color: 'var(--color-text-secondary)',
-                    lineHeight: 1.5,
-                    marginBottom: '14px',
-                  }}
-                >
-                  {project.description}
-                </p>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', flex: 1 }}>
-                    {project.stack.map((tech) => (
-                      <span key={tech} className="chip-quiet">
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
-                  <span
-                    style={{
-                      fontSize: '13px',
-                      fontWeight: 500,
-                      color: 'var(--color-accent)',
-                      whiteSpace: 'nowrap',
-                      flexShrink: 0,
-                    }}
-                  >
-                    Visit Portfolio
-                  </span>
-                </div>
-              </div>
-            </div>
-          ))}
-
-          {/* Regular project grid */}
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-              gap: '14px',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(176px, 1fr))',
+              gap: '10px',
             }}
           >
-            {regular.map((project) => (
-              <div
-                key={project.name}
-                onClick={() => handleVisit(project.url)}
+            {FAVORITES.map((site) => (
+              <button
+                key={site.url}
+                type="button"
+                onClick={() => handleVisit(site.url)}
                 style={{
-                  borderRadius: '12px',
-                  overflow: 'hidden',
-                  background: 'var(--color-bg-hover)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                  gap: '10px',
+                  padding: '16px 16px 14px',
+                  borderRadius: 'var(--radius-control)',
                   border: '0.5px solid var(--color-border)',
-                  boxShadow: 'none',
+                  background: 'var(--color-bg-hover)',
                   cursor: 'pointer',
-                  transition: 'border-color 180ms ease, box-shadow 180ms ease',
+                  textAlign: 'left',
+                  color: 'inherit',
+                  fontFamily: 'inherit',
+                  transition: 'border-color 140ms ease, background 140ms ease',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.boxShadow = 'var(--shadow-window)';
                   e.currentTarget.style.borderColor = 'var(--color-border-active)';
+                  e.currentTarget.style.background = 'var(--color-bg-active)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.boxShadow = 'none';
                   e.currentTarget.style.borderColor = 'var(--color-border)';
+                  e.currentTarget.style.background = 'var(--color-bg-hover)';
                 }}
               >
-                <PreviewContent project={project} />
-                <div style={{ padding: '12px 14px 14px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
-                    <h3
-                      style={{
-                        fontSize: '14px',
-                        fontWeight: 500,
-                        letterSpacing: 'var(--tracking-snug)',
-                        color: 'var(--color-text-primary)',
-                        margin: 0,
-                      }}
-                    >
-                      {project.name}
-                    </h3>
-                    <span
-                      style={{
-                        fontSize: '10px',
-                        color: 'var(--color-text-tertiary)',
-                        fontFamily: 'var(--font-mono)',
-                      }}
-                    >
-                      {project.url.replace('https://', '')}
-                    </span>
-                  </div>
-                  <p
+                <div
+                  aria-hidden
+                  style={{
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '10px',
+                    background: 'var(--color-bg-input)',
+                    border: '0.5px solid var(--color-border)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'var(--color-text-primary)',
+                    fontSize: 'var(--text-md)',
+                    fontWeight: 'var(--weight-medium)',
+                    letterSpacing: 'var(--tracking-snug)',
+                  }}
+                >
+                  {site.name.slice(0, 1)}
+                </div>
+                <div>
+                  <div
                     style={{
-                      fontSize: '12px',
-                      color: 'var(--color-text-secondary)',
-                      lineHeight: 1.4,
-                      marginBottom: '10px',
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: 'var(--weight-medium)',
+                      letterSpacing: 'var(--tracking-snug)',
+                      color: 'var(--color-text-primary)',
+                      marginBottom: '3px',
                     }}
                   >
-                    {project.description}
-                  </p>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
-                    {project.stack.map((tech) => (
-                      <span key={tech} className="chip-quiet">
-                        {tech}
-                      </span>
-                    ))}
+                    {site.name}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 'var(--text-xs)',
+                      color: 'var(--color-text-tertiary)',
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    {hostname(site.url)}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 'var(--text-xs)',
+                      color: 'var(--color-text-secondary)',
+                      lineHeight: 1.4,
+                      marginTop: '6px',
+                    }}
+                  >
+                    {site.note}
                   </div>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         </div>

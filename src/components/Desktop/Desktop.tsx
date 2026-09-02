@@ -23,7 +23,7 @@ function AppLoader({ appId, windowId, appProps }: { appId: string; windowId: str
         className="flex items-center justify-center h-full"
         style={{ color: 'var(--color-text-secondary)', fontFamily: 'var(--font-mono)', fontSize: '14px' }}
       >
-        {appId} - coming soon
+        {appId}: coming soon
       </div>
     );
   }
@@ -94,15 +94,15 @@ export function Desktop() {
     const t1 = setTimeout(() => {
       push({
         title: 'Welcome to RahulOS',
-        body: 'Explore the desktop, open apps from the dock, or right-click for options.',
+        body: 'Open apps from the dock, browse Files, or press Cmd+K for voice.',
         duration: 6000,
       });
     }, 2000);
 
     const t2 = setTimeout(() => {
       push({
-        title: 'Check out the Projects folder',
-        body: 'Open Files from the dock to browse project showcases.',
+        title: 'Projects live in Files',
+        body: 'Open Files from the dock, then open the Projects folder.',
         duration: 5000,
       });
     }, 60000);

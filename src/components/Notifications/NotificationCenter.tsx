@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useNotificationStore, type Notification } from '../../stores/notificationStore.ts';
+import { RahulOSIcon } from '../shared/AppIcons.tsx';
 
 function NotificationToast({ notification }: { notification: Notification }) {
   const dismiss = useNotificationStore((s) => s.dismiss);
@@ -38,17 +39,11 @@ function NotificationToast({ notification }: { notification: Notification }) {
           width: '32px',
           height: '32px',
           borderRadius: '8px',
-          background: 'linear-gradient(135deg, #0A84FF, #5E5CE6)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          overflow: 'hidden',
           flexShrink: 0,
-          fontSize: '16px',
-          color: 'white',
-          fontWeight: 600,
         }}
       >
-        R
+        <RahulOSIcon />
       </div>
       <div className="flex-1 min-w-0">
         <div

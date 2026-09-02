@@ -77,7 +77,7 @@ export const appRegistry: Record<string, AppManifest> = {
   },
   about: {
     id: 'about',
-    name: 'About This Mac',
+    name: 'About This Computer',
     component: LazyAbout,
     defaultSize: { width: 500, height: 340 },
     minSize: { width: 400, height: 300 },
@@ -97,7 +97,7 @@ export const appRegistry: Record<string, AppManifest> = {
   },
   texteditor: {
     id: 'texteditor',
-    name: 'TextEdit',
+    name: 'Notes',
     component: LazyTextEditor,
     defaultSize: { width: 700, height: 500 },
     minSize: { width: 400, height: 300 },
@@ -107,13 +107,13 @@ export const appRegistry: Record<string, AppManifest> = {
   },
   browser: {
     id: 'browser',
-    name: 'Safari',
+    name: 'Browser',
     component: LazyBrowser,
     defaultSize: { width: 900, height: 600 },
     minSize: { width: 500, height: 400 },
     allowMultiple: true,
     showInDock: true,
-    showOnDesktop: false,
+    showOnDesktop: true,
   },
   visitorboard: {
     id: 'visitorboard',

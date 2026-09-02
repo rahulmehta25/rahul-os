@@ -53,17 +53,17 @@
     0 12px 40px rgba(0, 0, 0, 0.5),
     0 2px 8px rgba(0, 0, 0, 0.3);
 
-  /* Radii — macOS standard */
+  /* Radii */
   --radius-window: 10px;
-  --radius-dock: 16px;
+  --radius-dock: 20px;
   --radius-button: 6px;
-  --radius-context-menu: 6px;
+  --radius-context-menu: 8px;
 
   /* Spacing */
-  --titlebar-height: 52px;
-  --menubar-height: 25px;
+  --titlebar-height: 28px;
+  --menubar-height: 28px;
   --dock-height: 72px;
-  --dock-margin: 4px;
+  --dock-margin: 8px;
 
   /* Typography — SF Pro system stack */
   --font-system: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', system-ui, sans-serif;

@@ -99,8 +99,13 @@ export function VoiceOverlay() {
         setOpen(false);
       }
     };
+    const onToggle = () => setOpen((v) => !v);
     document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
+    window.addEventListener('rahulos:toggle-voice', onToggle);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      window.removeEventListener('rahulos:toggle-voice', onToggle);
+    };
   }, [open]);
 
   useEffect(() => {
@@ -141,7 +146,7 @@ export function VoiceOverlay() {
             </div>
           </div>
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, opacity: 0.6 }}>
-            {AGENT_ID ? AGENT_ID.slice(0, 14) + '...' : 'no agent id'}
+            Esc to close
           </div>
         </div>
 
@@ -173,9 +178,9 @@ export function VoiceOverlay() {
           className="px-5 py-4 border-t border-white/10 max-h-56 overflow-y-auto"
           style={{ fontFamily: 'var(--font-mono)', fontSize: 12 }}
         >
-          <div style={{ opacity: 0.5, marginBottom: 6 }}>intent log</div>
+          <div style={{ opacity: 0.5, marginBottom: 6 }}>Recent commands</div>
           {log.length === 0 ? (
-            <div style={{ opacity: 0.4 }}>(empty)</div>
+            <div style={{ opacity: 0.4 }}>None yet. Try "open terminal".</div>
           ) : (
             <ul className="space-y-1">
               {log.slice(-12).map((entry, i) => (

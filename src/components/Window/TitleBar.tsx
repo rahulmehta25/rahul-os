@@ -1,7 +1,9 @@
 import { useCallback, useState } from 'react';
+import { AppIcon } from '../shared/AppIcons.tsx';
 
 interface TitleBarProps {
   title: string;
+  appId: string;
   isActive: boolean;
   onClose: () => void;
   onMinimize: () => void;
@@ -11,6 +13,7 @@ interface TitleBarProps {
 
 export function TitleBar({
   title,
+  appId,
   isActive,
   onClose,
   onMinimize,
@@ -18,6 +21,7 @@ export function TitleBar({
   onDragPointerDown,
 }: TitleBarProps) {
   const [hovered, setHovered] = useState(false);
+  const showGlyphs = hovered;
 
   const handleDoubleClick = useCallback(
     (e: React.MouseEvent) => {
@@ -27,13 +31,8 @@ export function TitleBar({
     [onMaximize],
   );
 
-  const trafficLightColor = (activeColor: string) =>
+  const lightFill = (activeColor: string) =>
     isActive || hovered ? activeColor : 'var(--color-traffic-inactive)';
-
-  const trafficLightShadow =
-    isActive || hovered
-      ? 'inset 0 -0.5px 0.5px rgba(0,0,0,0.2)'
-      : 'none';
 
   return (
     <div
@@ -43,38 +42,25 @@ export function TitleBar({
         background: isActive
           ? 'var(--color-bg-titlebar)'
           : 'var(--color-bg-titlebar-inactive)',
-        borderBottom: '1px solid var(--color-border)',
+        borderBottom: '0.5px solid var(--color-border)',
         borderRadius: 'var(--radius-window) var(--radius-window) 0 0',
         touchAction: 'none',
       }}
       onDoubleClick={handleDoubleClick}
       onPointerDown={onDragPointerDown}
     >
-      {/* Traffic lights */}
       <div
         className="flex items-center shrink-0"
-        style={{ paddingLeft: '14px', paddingRight: '8px', gap: '8px' }}
+        style={{ paddingLeft: '8px', paddingRight: '6px', gap: '8px', height: '100%' }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
-        {/* Close */}
-        <button
-          className="rounded-full flex items-center justify-center"
-          style={{
-            width: '12px',
-            height: '12px',
-            background: trafficLightColor('var(--color-close)'),
-            transition: 'background 100ms ease',
-            boxShadow: trafficLightShadow,
-          }}
-          onClick={(e) => {
-            e.stopPropagation();
-            onClose();
-          }}
-          onPointerDown={(e) => e.stopPropagation()}
-          aria-label="Close window"
+        <TrafficLight
+          color={lightFill('var(--color-close)')}
+          label="Close window"
+          onClick={onClose}
         >
-          {hovered && (
+          {showGlyphs && (
             <svg width="6" height="6" viewBox="0 0 6 6" fill="none">
               <path
                 d="M0.5 0.5L5.5 5.5M5.5 0.5L0.5 5.5"
@@ -84,26 +70,14 @@ export function TitleBar({
               />
             </svg>
           )}
-        </button>
+        </TrafficLight>
 
-        {/* Minimize */}
-        <button
-          className="rounded-full flex items-center justify-center"
-          style={{
-            width: '12px',
-            height: '12px',
-            background: trafficLightColor('var(--color-minimize)'),
-            transition: 'background 100ms ease',
-            boxShadow: trafficLightShadow,
-          }}
-          onClick={(e) => {
-            e.stopPropagation();
-            onMinimize();
-          }}
-          onPointerDown={(e) => e.stopPropagation()}
-          aria-label="Minimize window"
+        <TrafficLight
+          color={lightFill('var(--color-minimize)')}
+          label="Minimize window"
+          onClick={onMinimize}
         >
-          {hovered && (
+          {showGlyphs && (
             <svg width="6" height="6" viewBox="0 0 6 6" fill="none">
               <path
                 d="M1 3H5"
@@ -113,26 +87,14 @@ export function TitleBar({
               />
             </svg>
           )}
-        </button>
+        </TrafficLight>
 
-        {/* Maximize */}
-        <button
-          className="rounded-full flex items-center justify-center"
-          style={{
-            width: '12px',
-            height: '12px',
-            background: trafficLightColor('var(--color-maximize)'),
-            transition: 'background 100ms ease',
-            boxShadow: trafficLightShadow,
-          }}
-          onClick={(e) => {
-            e.stopPropagation();
-            onMaximize();
-          }}
-          onPointerDown={(e) => e.stopPropagation()}
-          aria-label="Maximize window"
+        <TrafficLight
+          color={lightFill('var(--color-maximize)')}
+          label="Maximize window"
+          onClick={onMaximize}
         >
-          {hovered && (
+          {showGlyphs && (
             <svg width="6" height="6" viewBox="0 0 6 6" fill="none">
               <path
                 d="M0.5 2V0.5H2"
@@ -150,25 +112,77 @@ export function TitleBar({
               />
             </svg>
           )}
-        </button>
+        </TrafficLight>
       </div>
 
-      {/* Title */}
       <div
-        className="flex-1 text-center truncate pointer-events-none"
-        style={{
-          color: isActive
-            ? 'var(--color-text-primary)'
-            : 'var(--color-text-secondary)',
-          fontSize: '13px',
-          fontWeight: 600,
-          fontFamily: 'var(--font-system)',
-          letterSpacing: '-0.01em',
-          marginRight: '60px',
-        }}
+        className="flex-1 flex items-center justify-center min-w-0 pointer-events-none"
+        style={{ marginRight: '68px', gap: '6px' }}
       >
-        {title}
+        <div
+          style={{
+            width: '14px',
+            height: '14px',
+            flexShrink: 0,
+            borderRadius: '3px',
+            overflow: 'hidden',
+            opacity: isActive ? 1 : 0.7,
+          }}
+        >
+          <AppIcon appId={appId} />
+        </div>
+        <div
+          className="truncate"
+          style={{
+            color: isActive
+              ? 'var(--color-text-primary)'
+              : 'var(--color-text-secondary)',
+            fontSize: '13px',
+            fontWeight: 600,
+            fontFamily: 'var(--font-system)',
+            letterSpacing: '-0.01em',
+            lineHeight: 1,
+          }}
+        >
+          {title}
+        </div>
       </div>
     </div>
+  );
+}
+
+function TrafficLight({
+  color,
+  label,
+  onClick,
+  children,
+}: {
+  color: string;
+  label: string;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      className="rounded-full flex items-center justify-center"
+      style={{
+        width: '12px',
+        height: '12px',
+        background: color,
+        transition: 'background 100ms ease, filter 100ms ease',
+        boxShadow: 'inset 0 0 0 0.5px rgba(0,0,0,0.18)',
+        padding: 0,
+        border: 'none',
+        cursor: 'default',
+      }}
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick();
+      }}
+      onPointerDown={(e) => e.stopPropagation()}
+      aria-label={label}
+    >
+      {children}
+    </button>
   );
 }

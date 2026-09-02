@@ -456,7 +456,7 @@ export function Browser() {
 
   return (
     <div className="flex flex-col h-full" style={{ fontFamily: 'var(--font-system)' }}>
-      {/* Safari toolbar */}
+      {/* Browser toolbar */}
       <div
         style={{
           display: 'flex',
@@ -599,7 +599,7 @@ export function Browser() {
         style={{ padding: '28px 24px', background: 'var(--color-bg-surface-solid)' }}
       >
         <div style={{ maxWidth: '860px', margin: '0 auto' }}>
-          {/* Favorites header */}
+          {/* Projects header */}
           <h2
             style={{
               fontSize: '20px',
@@ -609,7 +609,7 @@ export function Browser() {
               paddingLeft: '2px',
             }}
           >
-            Favorites
+            Projects
           </h2>
 
           {/* Featured portfolio card (full width) */}

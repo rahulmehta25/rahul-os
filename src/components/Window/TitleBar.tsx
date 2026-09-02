@@ -34,6 +34,11 @@ export function TitleBar({
   const lightFill = (activeColor: string) =>
     isActive || hovered ? activeColor : 'var(--color-traffic-inactive)';
 
+  const trafficLightShadow =
+    isActive || hovered
+      ? 'inset 0 -0.5px 0.5px rgba(0,0,0,0.22), inset 0 0.5px 0.5px rgba(255,255,255,0.28)'
+      : 'none';
+
   return (
     <div
       className="flex items-center shrink-0 select-none"
@@ -51,12 +56,13 @@ export function TitleBar({
     >
       <div
         className="flex items-center shrink-0"
-        style={{ paddingLeft: '8px', paddingRight: '6px', gap: '8px', height: '100%' }}
+        style={{ paddingLeft: '12px', paddingRight: '8px', gap: '8px', height: '100%' }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
         <TrafficLight
           color={lightFill('var(--color-close)')}
+          shadow={trafficLightShadow}
           label="Close window"
           onClick={onClose}
         >
@@ -74,6 +80,7 @@ export function TitleBar({
 
         <TrafficLight
           color={lightFill('var(--color-minimize)')}
+          shadow={trafficLightShadow}
           label="Minimize window"
           onClick={onMinimize}
         >
@@ -91,6 +98,7 @@ export function TitleBar({
 
         <TrafficLight
           color={lightFill('var(--color-maximize)')}
+          shadow={trafficLightShadow}
           label="Maximize window"
           onClick={onMaximize}
         >
@@ -138,11 +146,11 @@ export function TitleBar({
           style={{
             color: isActive
               ? 'var(--color-text-primary)'
-              : 'var(--color-text-secondary)',
-            fontSize: '13px',
-            fontWeight: 600,
+              : 'var(--color-text-tertiary)',
+            fontSize: 'var(--text-sm)',
+            fontWeight: 'var(--weight-medium)',
             fontFamily: 'var(--font-system)',
-            letterSpacing: '-0.01em',
+            letterSpacing: 'var(--tracking-snug)',
             lineHeight: 1,
           }}
         >
@@ -155,11 +163,13 @@ export function TitleBar({
 
 function TrafficLight({
   color,
+  shadow,
   label,
   onClick,
   children,
 }: {
   color: string;
+  shadow: string;
   label: string;
   onClick: () => void;
   children: React.ReactNode;
@@ -172,7 +182,7 @@ function TrafficLight({
         height: '12px',
         background: color,
         transition: 'background 100ms ease, filter 100ms ease',
-        boxShadow: 'inset 0 0 0 0.5px rgba(0,0,0,0.18)',
+        boxShadow: shadow,
         padding: 0,
         border: 'none',
         cursor: 'default',

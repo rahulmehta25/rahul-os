@@ -35,13 +35,13 @@ export function DesktopIcons() {
     <div
       className="absolute"
       style={{
-        top: 'calc(var(--menubar-height) + 18px)',
-        left: '18px',
+        top: 'calc(var(--menubar-height) + 20px)',
+        left: '20px',
         zIndex: 'var(--z-desktop-icons)',
         display: 'grid',
         gridTemplateColumns: '88px',
         gridAutoRows: '96px',
-        rowGap: '4px',
+        gap: '4px',
       }}
       onClick={handleDesktopClick}
     >
@@ -54,11 +54,14 @@ export function DesktopIcons() {
             className="flex flex-col items-center justify-start"
             style={{
               width: '88px',
-              padding: '6px 4px 4px',
-              background: 'transparent',
+              paddingTop: '8px',
+              paddingBottom: '6px',
+              background: isSelected ? 'rgba(255, 255, 255, 0.14)' : 'transparent',
               border: 'none',
-              cursor: 'default',
+              cursor: 'pointer',
+              transition: 'background 120ms ease',
               outline: 'none',
+              borderRadius: '10px',
             }}
             onClick={(e) => handleClick(e, icon.appId)}
             onDoubleClick={() => handleDoubleClick(icon.appId, icon.label, icon.defaultSize)}
@@ -69,11 +72,11 @@ export function DesktopIcons() {
                 width: '56px',
                 height: '56px',
                 flexShrink: 0,
-                filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.4)) drop-shadow(0 1px 2px rgba(0,0,0,0.25))',
-                borderRadius: '13px',
+                filter: 'drop-shadow(0 6px 12px rgba(0,0,0,0.32)) drop-shadow(0 1px 2px rgba(0,0,0,0.2))',
+                borderRadius: '14px',
                 overflow: 'hidden',
                 position: 'relative',
-                boxShadow: isSelected ? '0 0 0 3px rgba(10, 132, 255, 0.55)' : 'none',
+                boxShadow: isSelected ? '0 0 0 2px rgba(255, 255, 255, 0.55)' : 'none',
               }}
             >
               <AppIcon appId={icon.appId} />
@@ -91,18 +94,18 @@ export function DesktopIcons() {
             <span
               style={{
                 marginTop: '5px',
-                fontSize: '11px',
-                color: '#fff',
+                fontSize: 'var(--text-xs)',
+                color: 'white',
                 fontFamily: 'var(--font-system)',
                 fontWeight: 500,
-                textShadow:
-                  '0 1px 3px rgba(0,0,0,0.95), 0 0 8px rgba(0,0,0,0.55), 0 2px 12px rgba(0,0,0,0.35)',
+                letterSpacing: '0.01em',
+                textShadow: '0 1px 3px rgba(0,0,0,0.75), 0 0 10px rgba(0,0,0,0.35)',
                 lineHeight: 1.2,
                 maxWidth: '84px',
                 textAlign: 'center',
                 padding: '1px 6px',
                 borderRadius: '4px',
-                background: isSelected ? 'rgba(10, 132, 255, 0.85)' : 'transparent',
+                background: isSelected ? 'rgba(255, 255, 255, 0.18)' : 'transparent',
                 display: '-webkit-box',
                 WebkitLineClamp: 2,
                 WebkitBoxOrient: 'vertical',

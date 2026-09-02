@@ -117,78 +117,163 @@ export function VoiceOverlay() {
   if (!open) return null;
 
   const connected = status === 'connected';
+  const statusLabel = connected
+    ? isSpeaking
+      ? 'Speaking'
+      : 'Listening'
+    : status === 'connecting'
+      ? 'Connecting'
+      : 'Ready';
 
   return (
     <div
-      className="fixed inset-0 z-[9999] flex items-start justify-center pt-[18vh]"
-      style={{ background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(6px)' }}
+      className="fixed inset-0 z-[9999] flex items-start justify-center"
+      style={{
+        paddingTop: '18vh',
+        background: 'var(--color-bg-overlay)',
+        backdropFilter: 'blur(18px) saturate(140%)',
+        WebkitBackdropFilter: 'blur(18px) saturate(140%)',
+        animation: 'chrome-fade 280ms ease-out',
+      }}
       onClick={() => setOpen(false)}
       role="dialog"
       aria-label="Voice command overlay"
     >
       <div
-        className="rounded-2xl shadow-2xl w-[min(640px,92vw)] overflow-hidden"
-        style={{ background: 'var(--color-surface, #1f1f27)', color: 'var(--color-text, #f5f5f7)' }}
+        className="w-[min(560px,92vw)] overflow-hidden"
+        style={{
+          background: 'var(--color-bg-surface)',
+          backdropFilter: 'var(--glass-blur)',
+          WebkitBackdropFilter: 'var(--glass-blur)',
+          border: '0.5px solid var(--color-border-active)',
+          borderRadius: '18px',
+          boxShadow: 'var(--shadow-window-active)',
+          color: 'var(--color-text-primary)',
+          animation: 'chrome-rise var(--rise-panel) both',
+        }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
-          <div className="flex items-center gap-3">
+        <div
+          aria-hidden
+          style={{
+            position: 'relative',
+            boxShadow: 'var(--glass-highlight)',
+          }}
+        />
+
+        <div
+          className="flex items-center justify-between"
+          style={{ padding: '18px 22px 12px' }}
+        >
+          <div className="flex items-center" style={{ gap: '10px' }}>
             <div
-              className="w-3 h-3 rounded-full"
               style={{
-                background: connected ? (isSpeaking ? '#f5872a' : '#3e8f4a') : '#666',
-                boxShadow: connected ? '0 0 12px currentColor' : 'none',
+                width: '8px',
+                height: '8px',
+                borderRadius: '50%',
+                background: connected ? (isSpeaking ? '#F5872A' : '#3E8F4A') : 'var(--color-text-tertiary)',
+                boxShadow: connected ? '0 0 10px currentColor' : 'none',
               }}
-              aria-hidden
             />
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 13 }}>
-              {connected ? (isSpeaking ? 'agent speaking' : 'listening') : status}
+            <div
+              style={{
+                fontSize: 'var(--text-md)',
+                fontWeight: 500,
+                letterSpacing: 'var(--tracking-snug)',
+              }}
+            >
+              {statusLabel}
             </div>
           </div>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, opacity: 0.6 }}>
+          <div
+            style={{
+              fontSize: 'var(--text-xs)',
+              letterSpacing: '0.04em',
+              color: 'var(--color-text-tertiary)',
+              fontWeight: 500,
+            }}
+          >
             Esc to close
           </div>
         </div>
 
-        <div className="px-5 py-6 flex items-center gap-4">
+        <div
+          className="flex items-center"
+          style={{ padding: '8px 22px 22px', gap: '14px' }}
+        >
           {connected ? (
             <button
               onClick={() => void stop()}
-              className="px-4 py-2 rounded-lg font-medium"
-              style={{ background: '#d4342a', color: 'white' }}
+              style={{
+                padding: '8px 16px',
+                borderRadius: 'var(--radius-control)',
+                border: 'none',
+                background: 'rgba(255, 69, 58, 0.16)',
+                color: '#FF6B63',
+                fontSize: 'var(--text-sm)',
+                fontWeight: 500,
+                cursor: 'pointer',
+              }}
             >
               End session
             </button>
           ) : (
             <button
               onClick={() => void start()}
-              className="px-4 py-2 rounded-lg font-medium"
-              style={{ background: '#3e8f4a', color: 'white' }}
+              style={{
+                padding: '8px 16px',
+                borderRadius: 'var(--radius-control)',
+                border: 'none',
+                background: 'var(--color-accent)',
+                color: '#fff',
+                fontSize: 'var(--text-sm)',
+                fontWeight: 500,
+                cursor: AGENT_ID && status !== 'connecting' ? 'pointer' : 'default',
+                opacity: AGENT_ID ? 1 : 0.5,
+              }}
               disabled={!AGENT_ID || status === 'connecting'}
             >
-              {status === 'connecting' ? 'Connecting...' : 'Start speaking'}
+              {status === 'connecting' ? 'Connecting' : 'Start speaking'}
             </button>
           )}
-          <div style={{ fontSize: 13, opacity: 0.7 }}>
-            Try: "open terminal", "open the file manager", "launch settings".
+          <div
+            style={{
+              fontSize: 'var(--text-sm)',
+              color: 'var(--color-text-secondary)',
+              lineHeight: 1.45,
+            }}
+          >
+            Open terminal. Open the file manager. Launch settings.
           </div>
         </div>
 
         <div
-          className="px-5 py-4 border-t border-white/10 max-h-56 overflow-y-auto"
-          style={{ fontFamily: 'var(--font-mono)', fontSize: 12 }}
+          style={{
+            padding: '14px 22px 18px',
+            borderTop: '0.5px solid var(--color-border)',
+            maxHeight: '200px',
+            overflowY: 'auto',
+            fontFamily: 'var(--font-mono)',
+            fontSize: '11px',
+            letterSpacing: 0,
+          }}
         >
-          <div style={{ opacity: 0.5, marginBottom: 6 }}>Recent commands</div>
+          <div
+            className="label-quiet"
+            style={{ marginBottom: '8px', fontFamily: 'var(--font-system)' }}
+          >
+            Recent commands
+          </div>
           {log.length === 0 ? (
-            <div style={{ opacity: 0.4 }}>None yet. Try "open terminal".</div>
+            <div style={{ color: 'var(--color-text-tertiary)' }}>None yet. Try "open terminal".</div>
           ) : (
-            <ul className="space-y-1">
+            <ul style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
               {log.slice(-12).map((entry, i) => (
-                <li key={entry.ts + ':' + i}>
-                  <span style={{ opacity: 0.6 }}>{new Date(entry.ts).toLocaleTimeString()} </span>
+                <li key={entry.ts + ':' + i} style={{ color: 'var(--color-text-secondary)' }}>
+                  <span style={{ opacity: 0.5 }}>{new Date(entry.ts).toLocaleTimeString()} </span>
                   <span style={{ color: '#82bcd2' }}>{entry.tool}</span>
-                  <span style={{ opacity: 0.7 }}>({JSON.stringify(entry.args)})</span>
-                  <span style={{ opacity: 0.5 }}> -&gt; {entry.result}</span>
+                  <span style={{ opacity: 0.65 }}> ({JSON.stringify(entry.args)})</span>
+                  <span style={{ opacity: 0.45 }}> {'->'} {entry.result}</span>
                 </li>
               ))}
             </ul>

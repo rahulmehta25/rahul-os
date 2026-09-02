@@ -463,11 +463,11 @@ export function Browser() {
           alignItems: 'center',
           gap: '10px',
           padding: '0 14px',
-          height: '44px',
+          height: '32px',
           background: 'var(--color-bg-titlebar)',
           backdropFilter: 'saturate(180%) blur(20px)',
           WebkitBackdropFilter: 'saturate(180%) blur(20px)',
-          borderBottom: '1px solid var(--color-border)',
+          borderBottom: '0.5px solid var(--color-border)',
           flexShrink: 0,
         }}
       >
@@ -596,20 +596,11 @@ export function Browser() {
       {/* Start page content */}
       <div
         className="flex-1 overflow-y-auto"
-        style={{ padding: '28px 24px', background: 'var(--color-bg-surface-solid)' }}
+        style={{ padding: '36px 32px 40px', background: 'transparent' }}
       >
         <div style={{ maxWidth: '860px', margin: '0 auto' }}>
-          {/* Projects header */}
-          <h2
-            style={{
-              fontSize: '20px',
-              fontWeight: 600,
-              color: 'var(--color-text-primary)',
-              marginBottom: '16px',
-              paddingLeft: '2px',
-            }}
-          >
-            Projects
+          <h2 className="label-quiet" style={{ marginBottom: '18px', paddingLeft: '2px' }}>
+            Favorites
           </h2>
 
           {/* Featured portfolio card (full width) */}
@@ -618,22 +609,22 @@ export function Browser() {
               key={project.name}
               onClick={() => handleVisit(project.url)}
               style={{
-                borderRadius: '10px',
+                borderRadius: '12px',
                 overflow: 'hidden',
-                background: 'var(--color-bg-surface-solid)',
-                border: '1px solid var(--color-border)',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                background: 'var(--color-bg-hover)',
+                border: '0.5px solid var(--color-border)',
+                boxShadow: 'none',
                 cursor: 'pointer',
-                marginBottom: '16px',
-                transition: 'transform 200ms ease, box-shadow 200ms ease',
+                marginBottom: '20px',
+                transition: 'border-color 180ms ease, box-shadow 180ms ease',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-3px)';
-                e.currentTarget.style.boxShadow = `0 8px 32px ${project.color}20, 0 2px 8px rgba(0,0,0,0.2)`;
+                e.currentTarget.style.boxShadow = 'var(--shadow-window)';
+                e.currentTarget.style.borderColor = 'var(--color-border-active)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
+                e.currentTarget.style.boxShadow = 'none';
+                e.currentTarget.style.borderColor = 'var(--color-border)';
               }}
             >
               <PreviewContent project={project} />
@@ -642,7 +633,8 @@ export function Browser() {
                   <h3
                     style={{
                       fontSize: '18px',
-                      fontWeight: 600,
+                      fontWeight: 500,
+                      letterSpacing: 'var(--tracking-tight)',
                       color: 'var(--color-text-primary)',
                       margin: 0,
                     }}
@@ -663,10 +655,9 @@ export function Browser() {
                   <p
                     style={{
                       fontSize: '13px',
-                      color: project.color,
-                      fontWeight: 500,
+                      color: 'var(--color-text-secondary)',
+                      fontWeight: 400,
                       marginBottom: '6px',
-                      opacity: 0.9,
                     }}
                   >
                     {project.tagline}
@@ -685,18 +676,7 @@ export function Browser() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', flex: 1 }}>
                     {project.stack.map((tech) => (
-                      <span
-                        key={tech}
-                        style={{
-                          fontSize: '10px',
-                          fontWeight: 500,
-                          color: project.color,
-                          background: project.color + '15',
-                          border: `1px solid ${project.color}25`,
-                          padding: '2px 8px',
-                          borderRadius: '10px',
-                        }}
-                      >
+                      <span key={tech} className="chip-quiet">
                         {tech}
                       </span>
                     ))}
@@ -710,7 +690,7 @@ export function Browser() {
                       flexShrink: 0,
                     }}
                   >
-                    Visit Portfolio →
+                    Visit Portfolio
                   </span>
                 </div>
               </div>
@@ -730,21 +710,21 @@ export function Browser() {
                 key={project.name}
                 onClick={() => handleVisit(project.url)}
                 style={{
-                  borderRadius: '10px',
+                  borderRadius: '12px',
                   overflow: 'hidden',
-                  background: 'var(--color-bg-surface-solid)',
-                  border: '1px solid var(--color-border)',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                  background: 'var(--color-bg-hover)',
+                  border: '0.5px solid var(--color-border)',
+                  boxShadow: 'none',
                   cursor: 'pointer',
-                  transition: 'transform 200ms ease, box-shadow 200ms ease',
+                  transition: 'border-color 180ms ease, box-shadow 180ms ease',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = `0 6px 24px ${project.color}15, 0 2px 8px rgba(0,0,0,0.2)`;
+                  e.currentTarget.style.boxShadow = 'var(--shadow-window)';
+                  e.currentTarget.style.borderColor = 'var(--color-border-active)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
+                  e.currentTarget.style.boxShadow = 'none';
+                  e.currentTarget.style.borderColor = 'var(--color-border)';
                 }}
               >
                 <PreviewContent project={project} />
@@ -753,7 +733,8 @@ export function Browser() {
                     <h3
                       style={{
                         fontSize: '14px',
-                        fontWeight: 600,
+                        fontWeight: 500,
+                        letterSpacing: 'var(--tracking-snug)',
                         color: 'var(--color-text-primary)',
                         margin: 0,
                       }}
@@ -785,18 +766,7 @@ export function Browser() {
                   </p>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
                     {project.stack.map((tech) => (
-                      <span
-                        key={tech}
-                        style={{
-                          fontSize: '10px',
-                          fontWeight: 500,
-                          color: project.color,
-                          background: project.color + '15',
-                          border: `1px solid ${project.color}25`,
-                          padding: '2px 8px',
-                          borderRadius: '10px',
-                        }}
-                      >
+                      <span key={tech} className="chip-quiet">
                         {tech}
                       </span>
                     ))}

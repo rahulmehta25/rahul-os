@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { SEQUOIA_DARK } from '../../styles/wallpapers.ts';
 
 const projects = [
   {
@@ -6,40 +7,30 @@ const projects = [
     description: 'B2B SaaS for ad performance management and optimization',
     tech: ['Next.js', 'TypeScript', 'Supabase', 'AWS'],
     url: 'https://osmoti.com',
-    gradient: 'linear-gradient(135deg, #3b82f6, #2563eb)',
-    accent: '#3b82f6',
   },
   {
     title: 'Keep Safe',
     description: 'Smart hotel safe with digital concierge and analytics',
     tech: ['React', 'Firebase', 'OpenAI', 'RAG'],
     url: 'https://beachbox.co',
-    gradient: 'linear-gradient(135deg, #22c55e, #16a34a)',
-    accent: '#22c55e',
   },
   {
     title: 'Analytics Pro',
     description: 'Marketing analytics platform with AI-powered natural language queries',
     tech: ['Next.js', 'FastAPI', 'BigQuery', 'Vertex AI'],
     url: 'https://analytics-pro-frontend.vercel.app',
-    gradient: 'linear-gradient(135deg, #eab308, #ca8a04)',
-    accent: '#eab308',
   },
   {
     title: 'RahulOS',
     description: 'This interactive desktop OS, built entirely in the browser',
     tech: ['React', 'TypeScript', 'Zustand', 'Tailwind'],
     url: 'https://os.rahul-mehta.me',
-    gradient: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
-    accent: '#8b5cf6',
   },
   {
     title: 'Screenshot Reviewer',
     description: 'Native macOS app for reviewing and cleaning screenshots with OCR',
     tech: ['Swift', 'SwiftUI', 'Vision', 'macOS'],
     url: 'https://github.com/rahulmehta25/File-Reviewer',
-    gradient: 'linear-gradient(135deg, #e11d48, #be123c)',
-    accent: '#e11d48',
   },
 ];
 
@@ -121,79 +112,85 @@ export function MobileFallback() {
       ref={containerRef}
       style={{
         minHeight: '100vh',
-        background: '#111111',
+        background: '#0e0e10',
         color: '#f5f5f7',
-        fontFamily:
-          "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', system-ui, sans-serif",
+        fontFamily: 'var(--font-system)',
         overflowX: 'hidden',
         scrollBehavior: 'smooth',
       }}
     >
-      {/* Header with gradient background */}
       <header
         style={{
-          background: 'linear-gradient(135deg, #0c1929 0%, #1a1a3e 40%, #2563eb 100%)',
-          padding: '48px 24px 40px',
+          padding: '56px 24px 40px',
           textAlign: 'center',
           position: 'relative',
           overflow: 'hidden',
         }}
       >
-        {/* Subtle noise/glow overlay */}
         <div
           style={{
             position: 'absolute',
             inset: 0,
-            background:
-              'radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.2) 0%, transparent 70%)',
+            background: SEQUOIA_DARK,
+            filter: 'blur(64px) brightness(0.55) saturate(1.1)',
+            transform: 'scale(1.2)',
+            pointerEvents: 'none',
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'radial-gradient(ellipse at 50% 0%, transparent 20%, rgba(0,0,0,0.45) 100%)',
             pointerEvents: 'none',
           }}
         />
 
-        {/* Avatar */}
         <div
           style={{
-            width: '80px',
-            height: '80px',
+            width: '72px',
+            height: '72px',
             borderRadius: '50%',
-            background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
+            background: 'linear-gradient(160deg, rgba(255,255,255,0.2), rgba(255,255,255,0.06))',
+            border: '0.5px solid rgba(255,255,255,0.28)',
+            boxShadow: 'inset 0 0.5px 0 rgba(255,255,255,0.35), 0 12px 32px rgba(0,0,0,0.28)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            margin: '0 auto 16px',
-            fontSize: '28px',
-            fontWeight: 700,
+            margin: '0 auto 20px',
+            fontSize: '22px',
+            fontWeight: 500,
+            letterSpacing: '-0.03em',
             color: '#fff',
-            boxShadow: '0 4px 24px rgba(59, 130, 246, 0.35)',
             position: 'relative',
           }}
         >
           RM
         </div>
 
-        {/* Name */}
         <h1
           style={{
-            fontSize: '24px',
-            fontWeight: 700,
+            fontSize: '28px',
+            fontWeight: 500,
+            letterSpacing: '-0.03em',
             color: '#ffffff',
-            margin: '0 0 4px',
+            margin: '0 0 8px',
             position: 'relative',
           }}
         >
           Rahul Mehta
         </h1>
 
-        {/* Tagline */}
         <p
           style={{
-            fontSize: '14px',
-            color: 'rgba(255, 255, 255, 0.7)',
-            margin: '0 0 20px',
+            fontSize: '13px',
+            color: 'rgba(255, 255, 255, 0.55)',
+            margin: '0 0 24px',
+            letterSpacing: '0.04em',
             position: 'relative',
           }}
         >
-          Startup Founder & AI/ML Engineer
+          Startup Founder and AI/ML Engineer
         </p>
 
         {/* Social icon buttons */}
@@ -234,22 +231,17 @@ export function MobileFallback() {
         </div>
       </header>
 
-      {/* Projects section */}
-      <section style={{ padding: '28px 20px' }}>
+      <section style={{ padding: '8px 20px 28px' }}>
         <h2
+          className="label-quiet"
           style={{
-            fontSize: '11px',
-            fontWeight: 600,
-            textTransform: 'uppercase',
-            letterSpacing: '1.2px',
-            color: '#6e6e73',
             marginBottom: '16px',
           }}
         >
           Projects
         </h2>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           {projects.map((p, i) => (
             <a
               key={p.title}
@@ -262,40 +254,30 @@ export function MobileFallback() {
                 textDecoration: 'none',
                 color: 'inherit',
                 borderRadius: '14px',
-                background: '#1c1c1e',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
+                background: 'rgba(28, 28, 30, 0.72)',
+                backdropFilter: 'blur(24px) saturate(160%)',
+                WebkitBackdropFilter: 'blur(24px) saturate(160%)',
+                border: '0.5px solid rgba(255, 255, 255, 0.12)',
                 overflow: 'hidden',
                 position: 'relative',
                 opacity: 0,
-                transform: 'translateY(16px)',
-                transition: `opacity 400ms ease ${i * 80}ms, transform 400ms ease ${i * 80}ms`,
+                transform: 'translateY(8px)',
+                transition: `opacity 420ms cubic-bezier(0.22, 1, 0.36, 1) ${i * 40}ms, transform 420ms cubic-bezier(0.22, 1, 0.36, 1) ${i * 40}ms`,
               }}
             >
-              {/* Left accent border */}
-              <div
-                style={{
-                  position: 'absolute',
-                  left: 0,
-                  top: 0,
-                  bottom: 0,
-                  width: '3px',
-                  background: p.gradient,
-                  borderRadius: '3px 0 0 3px',
-                }}
-              />
-
-              <div style={{ padding: '16px 16px 16px 20px' }}>
+              <div style={{ padding: '18px 18px 16px' }}>
                 <div
                   style={{
                     display: 'flex',
-                    alignItems: 'center',
+                    alignItems: 'baseline',
                     justifyContent: 'space-between',
-                    marginBottom: '6px',
+                    gap: '12px',
+                    marginBottom: '8px',
                   }}
                 >
-                  <span style={{ fontSize: '16px', fontWeight: 600 }}>{p.title}</span>
-                  <span style={{ fontSize: '13px', color: p.accent, fontWeight: 500 }}>
-                    View Project →
+                  <span style={{ fontSize: '16px', fontWeight: 500, letterSpacing: '-0.02em' }}>{p.title}</span>
+                  <span style={{ fontSize: '12px', color: '#6e6e73', fontWeight: 400 }}>
+                    Open
                   </span>
                 </div>
 
@@ -304,7 +286,7 @@ export function MobileFallback() {
                     fontSize: '14px',
                     lineHeight: 1.5,
                     color: '#a1a1a6',
-                    margin: '0 0 12px',
+                    margin: '0 0 14px',
                   }}
                 >
                   {p.description}
@@ -317,10 +299,11 @@ export function MobileFallback() {
                       style={{
                         fontSize: '11px',
                         fontWeight: 500,
-                        padding: '2px 8px',
-                        borderRadius: '6px',
-                        background: `${p.accent}18`,
-                        color: p.accent,
+                        padding: '3px 9px',
+                        borderRadius: '999px',
+                        background: 'rgba(255,255,255,0.06)',
+                        color: '#a1a1a6',
+                        border: '0.5px solid rgba(255,255,255,0.08)',
                       }}
                     >
                       {t}
@@ -333,26 +316,26 @@ export function MobileFallback() {
         </div>
       </section>
 
-      {/* Desktop experience banner */}
       <footer
         data-reveal
         style={{
-          margin: '8px 20px 32px',
+          margin: '4px 20px 36px',
           padding: '14px 20px',
-          borderRadius: '100px',
-          background: 'rgba(255, 255, 255, 0.06)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
+          borderRadius: '12px',
+          background: 'rgba(255, 255, 255, 0.05)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          border: '0.5px solid rgba(255, 255, 255, 0.1)',
           textAlign: 'center',
-          fontSize: '14px',
+          fontSize: '13px',
+          letterSpacing: '-0.01em',
           color: '#a1a1a6',
           opacity: 0,
-          transform: 'translateY(16px)',
-          transition: 'opacity 400ms ease 400ms, transform 400ms ease 400ms',
+          transform: 'translateY(8px)',
+          transition: 'opacity 420ms cubic-bezier(0.22, 1, 0.36, 1) 160ms, transform 420ms cubic-bezier(0.22, 1, 0.36, 1) 160ms',
         }}
       >
-        Visit on desktop for the full RahulOS experience 💻
+        Visit on desktop for the full RahulOS experience
       </footer>
     </div>
   );

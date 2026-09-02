@@ -55,7 +55,7 @@ export function VisitorBoard() {
   return (
     <div
       style={{
-        padding: '18px 22px',
+        padding: '24px 28px',
         fontFamily: 'var(--font-system)',
         color: 'var(--color-text-primary)',
         height: '100%',
@@ -63,22 +63,16 @@ export function VisitorBoard() {
         background: 'var(--color-bg-surface-solid)',
       }}
     >
-      <header style={{ marginBottom: 16 }}>
-        <h2
-          style={{
-            margin: 0,
-            fontSize: 17,
-            fontWeight: 600,
-            letterSpacing: '-0.02em',
-          }}
-        >
+      <header style={{ marginBottom: 20 }}>
+        <h2 className="title-display" style={{ margin: 0 }}>
           Visitor Board
         </h2>
         <p
           style={{
-            margin: '4px 0 0',
-            fontSize: 12,
+            margin: '8px 0 0',
+            fontSize: 'var(--text-sm)',
             color: 'var(--color-text-secondary)',
+            lineHeight: 1.45,
           }}
         >
           Top sessions by time spent on this desktop.
@@ -109,11 +103,11 @@ export function VisitorBoard() {
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
           <thead>
             <tr style={{ textAlign: 'left', color: 'var(--color-text-tertiary)' }}>
-              <th style={{ padding: '6px 8px', fontWeight: 600 }}>#</th>
-              <th style={{ padding: '6px 8px', fontWeight: 600 }}>Session</th>
-              <th style={{ padding: '6px 8px', fontWeight: 600 }}>From</th>
-              <th style={{ padding: '6px 8px', fontWeight: 600 }}>Events</th>
-              <th style={{ padding: '6px 8px', fontWeight: 600 }}>Active</th>
+              <th className="label-quiet" style={{ padding: '8px 10px' }}>#</th>
+              <th className="label-quiet" style={{ padding: '8px 10px' }}>Session</th>
+              <th className="label-quiet" style={{ padding: '8px 10px' }}>From</th>
+              <th className="label-quiet" style={{ padding: '8px 10px' }}>Events</th>
+              <th className="label-quiet" style={{ padding: '8px 10px' }}>Active</th>
             </tr>
           </thead>
           <tbody>
@@ -122,21 +116,21 @@ export function VisitorBoard() {
                 key={r.session_id}
                 style={{ borderTop: '0.5px solid var(--color-border)' }}
               >
-                <td style={{ padding: '8px' }}>{i + 1}</td>
+                <td style={{ padding: '8px 10px' }}>{i + 1}</td>
                 <td
                   style={{
-                    padding: '8px',
+                    padding: '8px 10px',
                     fontFamily: 'var(--font-mono)',
                     fontSize: 12,
                   }}
                 >
                   {r.session_id}
                 </td>
-                <td style={{ padding: '8px' }}>
+                <td style={{ padding: '8px 10px' }}>
                   {flagEmoji(r.ip_country)} {r.ip_country ?? 'Unknown'}
                 </td>
-                <td style={{ padding: '8px' }}>{r.total_events}</td>
-                <td style={{ padding: '8px' }}>{formatDuration(r.total_seconds_active)}</td>
+                <td style={{ padding: '8px 10px' }}>{r.total_events}</td>
+                <td style={{ padding: '8px 10px' }}>{formatDuration(r.total_seconds_active)}</td>
               </tr>
             ))}
           </tbody>

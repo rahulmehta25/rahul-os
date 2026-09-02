@@ -94,21 +94,23 @@ export function ContextMenu() {
         left: x,
         top: y,
         zIndex: 'var(--z-context-menu)',
-        animation: 'ctx-menu-in 0.1s ease-out',
+        animation: 'chrome-rise-sm var(--rise-chrome) both',
       }}
     >
       <div
-        className="py-1 overflow-hidden"
+        className="overflow-hidden"
         style={{
           width: `${menuWidth}px`,
           background: 'var(--color-bg-surface)',
-          backdropFilter: 'blur(40px) saturate(1.8)',
-          WebkitBackdropFilter: 'blur(40px) saturate(1.8)',
+          backdropFilter: 'var(--glass-blur)',
+          WebkitBackdropFilter: 'var(--glass-blur)',
           border: '0.5px solid var(--color-border-active)',
           borderRadius: 'var(--radius-context-menu)',
           boxShadow: 'var(--shadow-context-menu)',
           fontFamily: 'var(--font-system)',
-          fontSize: '13px',
+          fontSize: 'var(--text-md)',
+          letterSpacing: 'var(--tracking-snug)',
+          padding: '6px 0',
         }}
       >
         {items.map((item, i) => {
@@ -130,19 +132,6 @@ export function ContextMenu() {
           );
         })}
       </div>
-
-      <style>{`
-        @keyframes ctx-menu-in {
-          from {
-            opacity: 0;
-            transform: scale(0.96);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-      `}</style>
     </div>
   );
 }
@@ -156,16 +145,17 @@ function ContextMenuItem({ label, onClick }: { label: string; onClick: () => voi
       style={{
         color: hovered ? '#ffffff' : 'var(--color-text-primary)',
         background: hovered ? 'var(--color-accent)' : 'transparent',
-        borderRadius: hovered ? 4 : 0,
-        margin: hovered ? '0 4px' : 0,
-        width: hovered ? 'calc(100% - 8px)' : '100%',
+        borderRadius: hovered ? 6 : 0,
+        margin: hovered ? '0 5px' : 0,
+        width: hovered ? 'calc(100% - 10px)' : '100%',
         display: 'block',
         border: 'none',
         cursor: 'default',
         fontFamily: 'var(--font-system)',
-        fontSize: '13px',
+        fontSize: 'var(--text-md)',
+        letterSpacing: 'var(--tracking-snug)',
         lineHeight: '22px',
-        padding: '1px 10px',
+        padding: '4px 12px',
         transition: 'background 60ms ease',
       }}
       onMouseEnter={() => setHovered(true)}

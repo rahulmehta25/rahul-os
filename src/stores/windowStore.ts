@@ -177,7 +177,7 @@ export const useWindowStore = create<WindowStore>((set, get) => ({
       }
 
       const menubarH = 28;
-      const dockH = 64 + 8;
+      const dockH = 80;
       return {
         windows: {
           ...state.windows,

@@ -205,8 +205,8 @@ export function FileManager() {
       <div
         className="flex items-center gap-1 px-3 shrink-0"
         style={{
-          height: '38px',
-          borderBottom: '1px solid var(--color-border)',
+          height: '36px',
+          borderBottom: '0.5px solid var(--color-border)',
           background: 'var(--color-bg-titlebar)',
           backdropFilter: 'blur(20px) saturate(180%)',
           WebkitBackdropFilter: 'blur(20px) saturate(180%)',
@@ -377,17 +377,20 @@ export function FileManager() {
       {/* Context menu */}
       {contextMenu && (
         <div
-          className="fixed rounded-lg overflow-hidden py-1"
+          className="fixed overflow-hidden"
           style={{
             left: contextMenu.x,
             top: contextMenu.y,
             zIndex: 2000,
             background: 'var(--color-bg-surface)',
-            backdropFilter: 'blur(20px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-            border: '1px solid var(--color-border)',
+            backdropFilter: 'var(--glass-blur)',
+            WebkitBackdropFilter: 'var(--glass-blur)',
+            border: '0.5px solid var(--color-border-active)',
+            borderRadius: 'var(--radius-context-menu)',
             boxShadow: 'var(--shadow-context-menu)',
             minWidth: '180px',
+            padding: '6px 0',
+            animation: 'chrome-rise-sm var(--rise-chrome) both',
           }}
           onClick={(e) => e.stopPropagation()}
         >

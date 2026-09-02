@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useNotificationStore, type Notification } from '../../stores/notificationStore.ts';
-import { RahulOSIcon } from '../shared/AppIcons.tsx';
+import { RahulOSMark } from '../shared/RahulOSMark.tsx';
 
 function NotificationToast({ notification }: { notification: Notification }) {
   const dismiss = useNotificationStore((s) => s.dismiss);
@@ -19,49 +19,55 @@ function NotificationToast({ notification }: { notification: Notification }) {
 
   return (
     <div
-      className="flex items-start gap-3"
+      className="flex items-start"
       style={{
-        padding: '10px 12px',
+        gap: '12px',
+        padding: '12px 14px',
         background: 'var(--color-bg-surface)',
-        backdropFilter: 'blur(40px) saturate(1.8)',
-        WebkitBackdropFilter: 'blur(40px) saturate(1.8)',
+        backdropFilter: 'var(--glass-blur)',
+        WebkitBackdropFilter: 'var(--glass-blur)',
         border: '0.5px solid var(--color-border-active)',
         borderRadius: '14px',
-        boxShadow: 'var(--shadow-context-menu)',
-        width: '340px',
-        animation: 'notif-slide-in 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+        boxShadow: 'var(--shadow-toast)',
+        width: '336px',
+        animation: 'chrome-rise var(--rise-panel) both',
         fontFamily: 'var(--font-system)',
       }}
     >
-      {/* App icon */}
       <div
         style={{
-          width: '32px',
-          height: '32px',
+          width: '30px',
+          height: '30px',
           borderRadius: '8px',
-          overflow: 'hidden',
+          background: 'linear-gradient(160deg, rgba(255,255,255,0.16), rgba(255,255,255,0.04))',
+          border: '0.5px solid var(--color-border-active)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
           flexShrink: 0,
+          color: 'var(--color-text-primary)',
         }}
       >
-        <RahulOSIcon />
+        <RahulOSMark size={14} />
       </div>
       <div className="flex-1 min-w-0">
         <div
           style={{
-            fontSize: '13px',
-            fontWeight: 600,
+            fontSize: 'var(--text-sm)',
+            fontWeight: 590,
+            letterSpacing: 'var(--tracking-snug)',
             color: 'var(--color-text-primary)',
-            marginBottom: '1px',
-            lineHeight: 1.3,
+            marginBottom: '2px',
+            lineHeight: 1.25,
           }}
         >
           {notification.title}
         </div>
         <div
           style={{
-            fontSize: '12px',
+            fontSize: 'var(--text-sm)',
             color: 'var(--color-text-secondary)',
-            lineHeight: '1.4',
+            lineHeight: 1.45,
           }}
         >
           {notification.body}
@@ -71,7 +77,7 @@ function NotificationToast({ notification }: { notification: Notification }) {
         className="shrink-0"
         style={{
           color: 'var(--color-text-tertiary)',
-          fontSize: '14px',
+          fontSize: '16px',
           lineHeight: 1,
           background: 'none',
           border: 'none',
@@ -100,10 +106,11 @@ export function NotificationCenter() {
 
   return (
     <div
-      className="fixed flex flex-col gap-2"
+      className="fixed flex flex-col"
       style={{
-        top: 'calc(var(--menubar-height) + 8px)',
-        right: '8px',
+        gap: '8px',
+        top: 'calc(var(--menubar-height) + 12px)',
+        right: '12px',
         zIndex: 'var(--z-notification)',
         pointerEvents: 'none',
       }}
@@ -113,19 +120,6 @@ export function NotificationCenter() {
           <NotificationToast notification={n} />
         </div>
       ))}
-
-      <style>{`
-        @keyframes notif-slide-in {
-          from {
-            opacity: 0;
-            transform: translateX(100%) scale(0.95);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0) scale(1);
-          }
-        }
-      `}</style>
     </div>
   );
 }

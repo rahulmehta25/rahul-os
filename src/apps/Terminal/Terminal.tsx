@@ -146,7 +146,7 @@ export function Terminal({ windowId }: { windowId: string }) {
       cwd,
       setCwd: (newCwd: string) => {
         setCwd(newCwd);
-        useWindowStore.getState().setTitle(windowId, `Terminal — ${newCwd.replace('/home/rahul', '~')}`);
+        useWindowStore.getState().setTitle(windowId, `Terminal: ${newCwd.replace('/home/rahul', '~')}`);
       },
       fs: fsApi,
       history: [...historyList, trimmed],

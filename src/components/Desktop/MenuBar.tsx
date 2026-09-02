@@ -15,7 +15,7 @@ export function MenuBar() {
   const openModal = useModalStore((s) => s.openModal);
 
   const activeWindow = activeWindowId ? windows[activeWindowId] : null;
-  const activeAppName = activeWindow?.title ?? 'Finder';
+  const activeAppName = activeWindow?.title ?? 'RahulOS';
 
   useEffect(() => {
     const interval = setInterval(() => setTime(new Date()), 1000);
@@ -137,7 +137,7 @@ export function MenuBar() {
         fontWeight: 400,
         color: 'var(--color-text-primary)',
         paddingLeft: '6px',
-        paddingRight: '10px',
+        paddingRight: '8px',
       }}
     >
       {/* Left side: Apple logo + active app name + menus */}
@@ -248,25 +248,34 @@ export function MenuBar() {
         )}
       </div>
 
-      {/* Right side: Status icons + Date/Time */}
+      {/* Right side: Voice hint + status icons + Date/Time */}
       <div
         className="flex items-center"
         style={{
           height: '100%',
-          gap: '14px',
+          gap: '2px',
           color: 'var(--color-text-primary)',
         }}
       >
-        <ControlCenterIcon />
-        <WifiIcon />
-        <div className="flex items-center" style={{ gap: '4px' }}>
-          <BatteryIcon />
-          <span style={{ fontSize: '11.5px', fontWeight: 400 }}>100%</span>
-        </div>
-        <div className="flex items-center" style={{ gap: '6px', fontSize: '12.5px' }}>
-          <span style={{ fontWeight: 400 }}>{dateStr}</span>
-          <span style={{ fontWeight: 500 }}>{formatted}</span>
-        </div>
+        <VoiceHintButton />
+        <StatusButton label="Control Center">
+          <ControlCenterIcon />
+        </StatusButton>
+        <StatusButton label="Wi-Fi: Connected">
+          <WifiIcon />
+        </StatusButton>
+        <StatusButton label="Battery: 100%">
+          <span className="flex items-center" style={{ gap: '4px' }}>
+            <BatteryIcon />
+            <span style={{ fontSize: '12px', fontWeight: 500 }}>100%</span>
+          </span>
+        </StatusButton>
+        <StatusButton label={dateStr}>
+          <div className="flex items-center" style={{ gap: '6px', fontSize: '13px', padding: '0 4px' }}>
+            <span style={{ fontWeight: 400 }}>{dateStr}</span>
+            <span style={{ fontWeight: 600 }}>{formatted}</span>
+          </div>
+        </StatusButton>
       </div>
     </div>
   );
@@ -296,7 +305,7 @@ function MenuBarButton({
         height: '100%',
         padding: '0 10px',
         background: isOpen ? 'var(--color-bg-active)' : hovered ? 'var(--color-bg-hover)' : 'transparent',
-        borderRadius: '3px',
+        borderRadius: '6px',
         color: 'var(--color-text-primary)',
         fontFamily: 'var(--font-system)',
         fontSize: '13px',
@@ -471,7 +480,98 @@ function MenuSeparator() {
   );
 }
 
-// --- Icons ---
+function StatusButton({
+  children,
+  label,
+}: {
+  children: React.ReactNode;
+  label: string;
+}) {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <button
+      type="button"
+      title={label}
+      aria-label={label}
+      className="flex items-center border-none cursor-default"
+      style={{
+        height: '22px',
+        padding: '0 8px',
+        background: hovered ? 'var(--color-bg-hover)' : 'transparent',
+        borderRadius: '6px',
+        color: 'var(--color-text-primary)',
+        transition: 'background 80ms ease',
+      }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {children}
+    </button>
+  );
+}
+
+function VoiceHintButton() {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <button
+      type="button"
+      title="Voice commands (Cmd+K)"
+      aria-label="Open voice commands"
+      className="flex items-center border-none"
+      style={{
+        height: '22px',
+        padding: '0 8px',
+        gap: '5px',
+        background: hovered ? 'var(--color-bg-hover)' : 'transparent',
+        borderRadius: '6px',
+        color: 'var(--color-text-primary)',
+        fontFamily: 'var(--font-system)',
+        fontSize: '12px',
+        fontWeight: 500,
+        cursor: 'pointer',
+        transition: 'background 80ms ease',
+      }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onClick={() => window.dispatchEvent(new Event('rahulos:toggle-voice'))}
+    >
+      <MicIcon />
+      <span>Voice</span>
+      <kbd
+        style={{
+          fontFamily: 'var(--font-system)',
+          fontSize: '10px',
+          fontWeight: 600,
+          opacity: 0.55,
+          letterSpacing: '0.02em',
+        }}
+      >
+        ⌘K
+      </kbd>
+    </button>
+  );
+}
+
+function MicIcon() {
+  return (
+    <svg
+      width="13"
+      height="13"
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      style={{ display: 'block', opacity: 0.9 }}
+    >
+      <rect x="5.5" y="1.5" width="5" height="8" rx="2.5" />
+      <path d="M3.5 7.5a4.5 4.5 0 009 0" />
+      <path d="M8 12v2.5" />
+    </svg>
+  );
+}
 
 function AppleIcon() {
   return (

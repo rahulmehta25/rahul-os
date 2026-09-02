@@ -41,7 +41,7 @@ export function open(args: string[], ctx: CommandContext): CommandResult {
       output: [
         'Usage: open <app>',
         '',
-        'Available apps: terminal, files, texteditor, browser, settings',
+        'Available apps: terminal, files, notes, browser, visitors, settings, snake',
       ],
     };
   }
@@ -50,11 +50,15 @@ export function open(args: string[], ctx: CommandContext): CommandResult {
     terminal: { id: 'terminal', name: 'Terminal' },
     files: { id: 'filemanager', name: 'Files' },
     filemanager: { id: 'filemanager', name: 'Files' },
-    texteditor: { id: 'texteditor', name: 'TextEdit' },
-    textedit: { id: 'texteditor', name: 'TextEdit' },
-    browser: { id: 'browser', name: 'Safari' },
-    safari: { id: 'browser', name: 'Safari' },
+    texteditor: { id: 'texteditor', name: 'Notes' },
+    textedit: { id: 'texteditor', name: 'Notes' },
+    notes: { id: 'texteditor', name: 'Notes' },
+    browser: { id: 'browser', name: 'Browser' },
+    safari: { id: 'browser', name: 'Browser' },
+    visitors: { id: 'visitorboard', name: 'Visitor Board' },
+    visitorboard: { id: 'visitorboard', name: 'Visitor Board' },
     settings: { id: 'settings', name: 'Settings' },
+    snake: { id: 'snake', name: 'Snake' },
   };
 
   const app = appMap[appName];

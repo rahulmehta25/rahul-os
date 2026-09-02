@@ -1,77 +1,36 @@
 import { useCallback, useRef, useState, useMemo } from 'react';
 import { useWindowStore } from '../../stores/windowStore.ts';
-import {
-  TerminalIcon,
-  FinderIcon,
-  TextEditIcon,
-  SafariIcon,
-  SettingsIcon,
-  SnakeIcon,
-} from '../shared/AppIcons.tsx';
+import { appRegistry } from '../../apps/registry.tsx';
+import { AppIcon } from '../shared/AppIcons.tsx';
 
 interface DockApp {
   id: string;
   name: string;
-  icon: React.ReactNode;
   defaultSize?: { width: number; height: number };
 }
 
-/* --- App definitions ------------------------------------------------------ */
+const DOCK_APP_IDS = ['terminal', 'filemanager', 'texteditor', 'browser', 'visitorboard', 'snake'];
+const UTILITY_APP_IDS = ['settings'];
 
-const dockApps: DockApp[] = [
-  {
-    id: 'terminal',
-    name: 'Terminal',
-    icon: <TerminalIcon />,
-    defaultSize: { width: 680, height: 420 },
-  },
-  {
-    id: 'filemanager',
-    name: 'Files',
-    icon: <FinderIcon />,
-    defaultSize: { width: 800, height: 520 },
-  },
-  {
-    id: 'texteditor',
-    name: 'TextEdit',
-    icon: <TextEditIcon />,
-    defaultSize: { width: 700, height: 500 },
-  },
-  {
-    id: 'browser',
-    name: 'Safari',
-    icon: <SafariIcon />,
-    defaultSize: { width: 900, height: 600 },
-  },
-  {
-    id: 'snake',
-    name: 'Snake',
-    icon: <SnakeIcon />,
-    defaultSize: { width: 420, height: 480 },
-  },
-];
-
-const utilityApps: DockApp[] = [
-  {
-    id: 'settings',
-    name: 'Settings',
-    icon: <SettingsIcon />,
-    defaultSize: { width: 600, height: 450 },
-  },
-];
-
-/* --- Magnification engine ------------------------------------------------- */
+function appsFromIds(ids: string[]): DockApp[] {
+  return ids.flatMap((id) => {
+    const manifest = appRegistry[id];
+    if (!manifest) return [];
+    return [
+      {
+        id: manifest.id,
+        name: manifest.name,
+        defaultSize: manifest.defaultSize,
+      },
+    ];
+  });
+}
 
 const BASE_SIZE = 48;
-const MAX_SIZE = 72;        // 1.5x at closest
-const INFLUENCE_PX = 180;   // pixel radius of the magnification effect
+const MAX_SIZE = 72;
+const INFLUENCE_PX = 180;
 const SIGMA = INFLUENCE_PX / 2.5;
 
-/**
- * Gaussian falloff for dock magnification.
- * Returns a scale factor (1.0 to MAX_SIZE/BASE_SIZE) based on pixel distance
- * from the cursor to the icon center.
- */
 function getScaleForDistance(pxDistance: number): number {
   if (pxDistance > INFLUENCE_PX) return 1.0;
   const gaussian = Math.exp(-(pxDistance * pxDistance) / (2 * SIGMA * SIGMA));
@@ -79,12 +38,11 @@ function getScaleForDistance(pxDistance: number): number {
   return 1.0 + (maxScale - 1.0) * gaussian;
 }
 
-/* --- Dock item ------------------------------------------------------------ */
-
 interface DockItemProps {
   app: DockApp;
   scale: number;
   hasOpenWindows: boolean;
+  isActive: boolean;
   isBouncing: boolean;
   isHovered: boolean;
   onMouseEnter: () => void;
@@ -96,6 +54,7 @@ function DockItem({
   app,
   scale,
   hasOpenWindows,
+  isActive,
   isBouncing,
   isHovered,
   onMouseEnter,
@@ -118,7 +77,6 @@ function DockItem({
           : 'width 300ms ease-out, height 300ms ease-out',
       }}
     >
-      {/* Tooltip */}
       <div
         className="dock-tooltip"
         style={{
@@ -134,7 +92,7 @@ function DockItem({
       </div>
 
       <button
-        className={`dock-icon-btn${isBouncing ? ' dock-bouncing' : ''}`}
+        className={`dock-icon-btn${isBouncing ? ' dock-bouncing' : ''}${isActive ? ' dock-icon-active' : ''}`}
         style={{
           width: size,
           height: size,
@@ -146,32 +104,30 @@ function DockItem({
         aria-label={`Open ${app.name}`}
       >
         <div className="dock-icon-inner">
-          {app.icon}
+          <AppIcon appId={app.id} />
           <div className="dock-icon-reflection" />
         </div>
       </button>
 
-      {/* Running indicator dot */}
       <div
-        className="dock-indicator"
+        className={`dock-indicator${isActive ? ' dock-indicator-active' : ''}`}
         style={{ opacity: hasOpenWindows ? 1 : 0 }}
       />
     </div>
   );
 }
 
-/* --- Main Dock component -------------------------------------------------- */
-
 export function Dock() {
-  const { windows, openWindow, focusWindow, restoreWindow } = useWindowStore();
+  const { windows, openWindow, focusWindow, restoreWindow, activeWindowId } = useWindowStore();
   const [bouncing, setBouncing] = useState<string | null>(null);
-  const [mouseXPx, setMouseXPx] = useState<number | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
-  const dockRef = useRef<HTMLDivElement>(null);
+  const [scales, setScales] = useState<Record<string, number>>({});
   const iconRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 
-  const allApps = useMemo(() => [...dockApps, ...utilityApps], []);
+  const dockApps = useMemo(() => appsFromIds(DOCK_APP_IDS), []);
+  const utilityApps = useMemo(() => appsFromIds(UTILITY_APP_IDS), []);
   const windowList = Object.values(windows);
+  const activeAppId = activeWindowId ? windows[activeWindowId]?.appId : undefined;
 
   const handleClick = useCallback(
     (app: DockApp) => {
@@ -199,58 +155,50 @@ export function Dock() {
     [windowList, openWindow, focusWindow, restoreWindow],
   );
 
-  const handleMouseMove = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      setMouseXPx(e.clientX);
-    },
-    [],
-  );
-
-  const handleMouseLeave = useCallback(() => {
-    setMouseXPx(null);
-    setHoveredId(null);
-  }, []);
-
-  const getIconScale = useCallback(
-    (appId: string): number => {
-      if (mouseXPx === null) return 1.0;
-      const el = iconRefs.current.get(appId);
-      if (!el) return 1.0;
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const mouseX = e.clientX;
+    const next: Record<string, number> = {};
+    iconRefs.current.forEach((el, id) => {
       const rect = el.getBoundingClientRect();
       const iconCenterX = rect.left + rect.width / 2;
-      return getScaleForDistance(Math.abs(mouseXPx - iconCenterX));
-    },
-    [mouseXPx],
-  );
+      next[id] = getScaleForDistance(Math.abs(mouseX - iconCenterX));
+    });
+    setScales(next);
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    setScales({});
+    setHoveredId(null);
+  }, []);
 
   const setIconRef = useCallback(
     (id: string) => (el: HTMLDivElement | null) => {
       if (el) {
         iconRefs.current.set(id, el);
+      } else {
+        iconRefs.current.delete(id);
       }
     },
     [],
   );
 
-  // Suppress lint: allApps is used for iconRefs setup
-  void allApps;
-
   return (
     <>
       <div
-        ref={dockRef}
         className="dock-container"
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
+        role="toolbar"
+        aria-label="App dock"
         style={{ zIndex: 'var(--z-dock)' } as React.CSSProperties}
       >
-        {/* App icons */}
         {dockApps.map((app) => (
           <div key={app.id} ref={setIconRef(app.id)} className="dock-item-wrapper">
             <DockItem
               app={app}
-              scale={getIconScale(app.id)}
+              scale={scales[app.id] ?? 1}
               hasOpenWindows={windowList.some((w) => w.appId === app.id)}
+              isActive={activeAppId === app.id}
               isBouncing={bouncing === app.id}
               isHovered={hoveredId === app.id}
               onMouseEnter={() => setHoveredId(app.id)}
@@ -259,17 +207,14 @@ export function Dock() {
             />
           </div>
         ))}
-
-        {/* Separator */}
         <div className="dock-separator" />
-
-        {/* Utility icons */}
         {utilityApps.map((app) => (
           <div key={app.id} ref={setIconRef(app.id)} className="dock-item-wrapper">
             <DockItem
               app={app}
-              scale={getIconScale(app.id)}
+              scale={scales[app.id] ?? 1}
               hasOpenWindows={windowList.some((w) => w.appId === app.id)}
+              isActive={activeAppId === app.id}
               isBouncing={bouncing === app.id}
               isHovered={hoveredId === app.id}
               onMouseEnter={() => setHoveredId(app.id)}
@@ -288,24 +233,24 @@ export function Dock() {
           transform: translateX(-50%);
           display: flex;
           align-items: flex-end;
-          gap: 2px;
-          padding: 4px 8px;
-          background: rgba(40, 40, 40, 0.45);
-          backdrop-filter: blur(30px) saturate(180%);
-          -webkit-backdrop-filter: blur(30px) saturate(180%);
-          border-radius: 18px;
-          border: 0.5px solid rgba(255, 255, 255, 0.08);
+          gap: 3px;
+          padding: 6px 10px 4px;
+          background: rgba(32, 32, 32, 0.52);
+          backdrop-filter: blur(36px) saturate(180%);
+          -webkit-backdrop-filter: blur(36px) saturate(180%);
+          border-radius: var(--radius-dock);
+          border: 0.5px solid rgba(255, 255, 255, 0.12);
           box-shadow:
-            inset 0 0.5px 0 0 rgba(255, 255, 255, 0.15),
-            0 8px 40px rgba(0, 0, 0, 0.35),
-            0 2px 8px rgba(0, 0, 0, 0.2);
+            inset 0 0.5px 0 0 rgba(255, 255, 255, 0.22),
+            0 10px 40px rgba(0, 0, 0, 0.38),
+            0 2px 8px rgba(0, 0, 0, 0.22);
         }
 
         [data-theme='light'] .dock-container {
-          background: rgba(246, 246, 246, 0.55);
-          border: 0.5px solid rgba(255, 255, 255, 0.6);
+          background: rgba(246, 246, 246, 0.62);
+          border: 0.5px solid rgba(255, 255, 255, 0.7);
           box-shadow:
-            inset 0 0.5px 0 0 rgba(255, 255, 255, 0.8),
+            inset 0 0.5px 0 0 rgba(255, 255, 255, 0.9),
             0 0 0 0.5px rgba(0, 0, 0, 0.06),
             0 8px 32px rgba(0, 0, 0, 0.1),
             0 2px 8px rgba(0, 0, 0, 0.05);
@@ -326,19 +271,17 @@ export function Dock() {
           flex-shrink: 0;
         }
 
-        /* --- Tooltip --- */
-
         .dock-tooltip {
           position: absolute;
-          top: -36px;
+          top: -38px;
           left: 50%;
           transform: translateX(-50%) translateY(6px);
-          padding: 4px 10px;
+          padding: 5px 11px;
           border-radius: 6px;
-          background: rgba(30, 30, 30, 0.88);
+          background: rgba(28, 28, 30, 0.92);
           backdrop-filter: blur(20px) saturate(1.5);
           -webkit-backdrop-filter: blur(20px) saturate(1.5);
-          border: 0.5px solid rgba(255, 255, 255, 0.12);
+          border: 0.5px solid rgba(255, 255, 255, 0.14);
           color: #f5f5f7;
           font-size: 12px;
           font-weight: 500;
@@ -346,8 +289,8 @@ export function Dock() {
           white-space: nowrap;
           pointer-events: none;
           opacity: 0;
-          transition: opacity 0.15s ease, transform 0.15s ease;
-          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+          transition: opacity 0.12s ease, transform 0.12s ease;
+          box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
           z-index: 10;
         }
 
@@ -360,18 +303,16 @@ export function Dock() {
           height: 0;
           border-left: 5px solid transparent;
           border-right: 5px solid transparent;
-          border-top: 5px solid rgba(30, 30, 30, 0.88);
+          border-top: 5px solid rgba(28, 28, 30, 0.92);
         }
 
         [data-theme='light'] .dock-tooltip {
-          background: rgba(40, 40, 40, 0.85);
+          background: rgba(40, 40, 40, 0.9);
         }
 
         [data-theme='light'] .dock-tooltip-arrow {
-          border-top-color: rgba(40, 40, 40, 0.85);
+          border-top-color: rgba(40, 40, 40, 0.9);
         }
-
-        /* --- Icon button --- */
 
         .dock-icon-btn {
           display: flex;
@@ -383,12 +324,12 @@ export function Dock() {
           cursor: pointer;
           border-radius: 12px;
           outline: none;
-          filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+          filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.32));
           transform-origin: bottom center;
         }
 
         .dock-icon-btn:hover {
-          filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.35));
+          filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.38));
         }
 
         .dock-icon-btn:active {
@@ -399,7 +340,6 @@ export function Dock() {
           box-shadow: 0 0 0 2px rgba(10, 132, 255, 0.6);
         }
 
-        /* Glass reflection overlay on each icon */
         .dock-icon-inner {
           width: 100%;
           height: 100%;
@@ -417,14 +357,12 @@ export function Dock() {
           border-radius: 22% 22% 0 0;
           background: linear-gradient(
             to bottom,
-            rgba(255, 255, 255, 0.18) 0%,
+            rgba(255, 255, 255, 0.2) 0%,
             rgba(255, 255, 255, 0.06) 40%,
             transparent 100%
           );
           pointer-events: none;
         }
-
-        /* --- Running indicator --- */
 
         .dock-indicator {
           width: 4px;
@@ -432,9 +370,15 @@ export function Dock() {
           border-radius: 50%;
           margin-top: 3px;
           background: #ffffff;
-          box-shadow: 0 0 4px rgba(255, 255, 255, 0.5);
-          transition: opacity 0.2s ease;
+          box-shadow: 0 0 5px rgba(255, 255, 255, 0.55);
+          transition: opacity 0.2s ease, transform 0.2s ease, background 0.2s ease;
           flex-shrink: 0;
+        }
+
+        .dock-indicator-active {
+          transform: scale(1.15);
+          background: #0A84FF;
+          box-shadow: 0 0 6px rgba(10, 132, 255, 0.7);
         }
 
         [data-theme='light'] .dock-indicator {
@@ -442,23 +386,24 @@ export function Dock() {
           box-shadow: 0 0 4px rgba(0, 0, 0, 0.15);
         }
 
-        /* --- Separator --- */
+        [data-theme='light'] .dock-indicator-active {
+          background: #007AFF;
+          box-shadow: 0 0 6px rgba(0, 122, 255, 0.5);
+        }
 
         .dock-separator {
           width: 1px;
-          height: 32px;
-          background: rgba(255, 255, 255, 0.15);
-          margin: 0 6px;
+          height: 36px;
+          background: rgba(255, 255, 255, 0.18);
+          margin: 0 8px;
           align-self: center;
           flex-shrink: 0;
-          border-radius: 0.5px;
+          border-radius: 1px;
         }
 
         [data-theme='light'] .dock-separator {
-          background: rgba(0, 0, 0, 0.1);
+          background: rgba(0, 0, 0, 0.12);
         }
-
-        /* --- Bounce animation: 3 bounces with decreasing amplitude, 800ms --- */
 
         .dock-bouncing {
           animation: dock-bounce 800ms ease-in-out;

@@ -55,63 +55,88 @@ export function VisitorBoard() {
   return (
     <div
       style={{
-        padding: '16px 20px',
-        fontFamily: 'var(--font-sans)',
-        color: 'var(--color-fg, #222)',
+        padding: '18px 22px',
+        fontFamily: 'var(--font-system)',
+        color: 'var(--color-text-primary)',
         height: '100%',
         overflow: 'auto',
+        background: 'var(--color-bg-surface-solid)',
       }}
     >
-      <header style={{ marginBottom: 14 }}>
-        <h2 style={{ margin: 0, fontSize: 18, fontWeight: 600 }}>Visitor leaderboard</h2>
-        <p style={{ margin: '4px 0 0', fontSize: 12, opacity: 0.7 }}>
-          Top 10 sessions by active time, read live from the rahulos Cloud SQL database.
+      <header style={{ marginBottom: 16 }}>
+        <h2
+          style={{
+            margin: 0,
+            fontSize: 17,
+            fontWeight: 600,
+            letterSpacing: '-0.02em',
+          }}
+        >
+          Visitor Board
+        </h2>
+        <p
+          style={{
+            margin: '4px 0 0',
+            fontSize: 12,
+            color: 'var(--color-text-secondary)',
+          }}
+        >
+          Top sessions by time spent on this desktop.
         </p>
       </header>
 
-      {loading && <div style={{ opacity: 0.7 }}>Loading…</div>}
+      {loading && (
+        <div style={{ color: 'var(--color-text-secondary)', fontSize: 13 }}>Loading visitors...</div>
+      )}
 
       {error && (
-        <div style={{ color: '#c53030', fontSize: 13 }}>
-          Couldn't reach <code>{API_BASE}/leaderboard</code> — {error}.
-          <div style={{ marginTop: 6, opacity: 0.75 }}>
-            Start the API with <code>npx tsx scripts/serve-visitors.ts</code> after running
-            <code> scripts/db-proxy.sh</code>.
+        <div style={{ color: '#FF453A', fontSize: 13, lineHeight: 1.5 }}>
+          Could not reach the visitor API ({error}).
+          <div style={{ marginTop: 6, color: 'var(--color-text-tertiary)' }}>
+            The board needs the local visitor server running. You can still tour the rest of the
+            desktop.
           </div>
         </div>
       )}
 
       {!loading && !error && rows.length === 0 && (
-        <div style={{ opacity: 0.7 }}>
-          No visitors yet. Run <code>npx tsx scripts/seed-visitors.ts</code> to seed demo rows.
+        <div style={{ color: 'var(--color-text-secondary)', fontSize: 13 }}>
+          No visitors yet. Open Files or Browser while you wait.
         </div>
       )}
 
       {!loading && !error && rows.length > 0 && (
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
           <thead>
-            <tr style={{ textAlign: 'left', opacity: 0.7 }}>
-              <th style={{ padding: '6px 8px' }}>#</th>
-              <th style={{ padding: '6px 8px' }}>Session</th>
-              <th style={{ padding: '6px 8px' }}>From</th>
-              <th style={{ padding: '6px 8px' }}>Events</th>
-              <th style={{ padding: '6px 8px' }}>Active</th>
+            <tr style={{ textAlign: 'left', color: 'var(--color-text-tertiary)' }}>
+              <th style={{ padding: '6px 8px', fontWeight: 600 }}>#</th>
+              <th style={{ padding: '6px 8px', fontWeight: 600 }}>Session</th>
+              <th style={{ padding: '6px 8px', fontWeight: 600 }}>From</th>
+              <th style={{ padding: '6px 8px', fontWeight: 600 }}>Events</th>
+              <th style={{ padding: '6px 8px', fontWeight: 600 }}>Active</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((r, i) => (
-              <tr key={r.session_id} style={{ borderTop: '1px solid rgba(0,0,0,0.08)' }}>
-                <td style={{ padding: '6px 8px' }}>{i + 1}</td>
-                <td style={{ padding: '6px 8px', fontFamily: 'var(--font-mono, monospace)' }}>
+              <tr
+                key={r.session_id}
+                style={{ borderTop: '0.5px solid var(--color-border)' }}
+              >
+                <td style={{ padding: '8px' }}>{i + 1}</td>
+                <td
+                  style={{
+                    padding: '8px',
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: 12,
+                  }}
+                >
                   {r.session_id}
                 </td>
-                <td style={{ padding: '6px 8px' }}>
-                  {flagEmoji(r.ip_country)} {r.ip_country ?? '—'}
+                <td style={{ padding: '8px' }}>
+                  {flagEmoji(r.ip_country)} {r.ip_country ?? 'Unknown'}
                 </td>
-                <td style={{ padding: '6px 8px' }}>{r.total_events}</td>
-                <td style={{ padding: '6px 8px' }}>
-                  {formatDuration(r.total_seconds_active)}
-                </td>
+                <td style={{ padding: '8px' }}>{r.total_events}</td>
+                <td style={{ padding: '8px' }}>{formatDuration(r.total_seconds_active)}</td>
               </tr>
             ))}
           </tbody>

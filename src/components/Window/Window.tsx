@@ -189,9 +189,11 @@ export function Window({ state, children }: WindowProps) {
           ? '#1e1e1e'
           : 'var(--color-bg-surface)',
         boxShadow: isActive
-          ? 'var(--shadow-window-active)'
-          : 'var(--shadow-window)',
-        border: '0.5px solid var(--color-border)',
+          ? 'var(--shadow-window-active), inset 0 0.5px 0 rgba(255,255,255,0.16)'
+          : 'var(--shadow-window), inset 0 0.5px 0 rgba(255,255,255,0.08)',
+        border: isActive
+          ? '0.5px solid var(--color-border-active)'
+          : '0.5px solid var(--color-border)',
         backdropFilter: (state.appId === 'terminal' || state.appId === 'snake') ? 'none' : 'blur(40px) saturate(1.8)',
         WebkitBackdropFilter: (state.appId === 'terminal' || state.appId === 'snake') ? 'none' : 'blur(40px) saturate(1.8)',
         outline: 'none',
@@ -202,6 +204,7 @@ export function Window({ state, children }: WindowProps) {
     >
       <TitleBar
         title={state.title}
+        appId={state.appId}
         isActive={isActive}
         onClose={handleClose}
         onMinimize={() => minimizeWindow(state.id)}

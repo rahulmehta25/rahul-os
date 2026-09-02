@@ -1,12 +1,13 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { posthog } from '../../lib/posthog';
+import { RahulOSMark } from '../shared/RahulOSMark.tsx';
 
 const POST_LINES = [
   'RahulOS BIOS v1.0.0',
   'Copyright (c) 2026 Rahul Mehta',
   '',
   'Initializing system...',
-  'CPU: Apple M-Series Virtual Core @ 3.2GHz',
+  'CPU: Virtual Core @ 3.2GHz',
   'Memory test: 16384 MB OK',
   'Detecting storage devices...',
   '  /dev/sda1: RahulOS Root (256GB SSD)',
@@ -34,7 +35,6 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
   const [flashLine, setFlashLine] = useState(-1);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // POST phase: typing effect with line-by-line reveal
   useEffect(() => {
     if (phase !== 'post') return;
 
@@ -42,7 +42,6 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
     const timer = setInterval(() => {
       setVisibleLines((prev) => {
         const next = prev + 1;
-        // Trigger brightness flash for this line
         setFlashLine(next - 1);
         setTimeout(() => setFlashLine(-1), 60);
 
@@ -57,7 +56,6 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
     return () => clearInterval(timer);
   }, [phase]);
 
-  // Splash phase: progress bar animation
   useEffect(() => {
     if (phase !== 'splash') return;
 
@@ -72,7 +70,6 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
       if (progress < 1) {
         raf = requestAnimationFrame(tick);
       } else {
-        // Start fade-out to transition to login
         setTimeout(() => setPhase('fade-out'), 200);
       }
     };
@@ -81,7 +78,6 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
     return () => cancelAnimationFrame(raf);
   }, [phase]);
 
-  // Fade-out phase: call onComplete after fade
   useEffect(() => {
     if (phase !== 'fade-out') return;
     const variant = posthog.getFeatureFlag?.('rahulos-boot-animation-variant') ?? 'classic';
@@ -90,7 +86,6 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
     return () => clearTimeout(timer);
   }, [phase, onComplete]);
 
-  // Auto-scroll POST text
   const scrollToBottom = useCallback(() => {
     if (containerRef.current) {
       containerRef.current.scrollTop = containerRef.current.scrollHeight;
@@ -113,22 +108,21 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
     >
       {phase === 'post' && (
         <>
-          {/* CRT vignette effect */}
           <div className="boot-vignette" />
 
-          {/* POST text */}
           <div
             ref={containerRef}
             className="boot-screen-flicker"
             style={{
               position: 'absolute',
               inset: 0,
-              padding: '24px',
+              padding: '32px 36px',
               overflow: 'hidden',
               fontFamily: 'var(--font-mono)',
-              fontSize: '14px',
-              lineHeight: '1.7',
-              color: '#33FF33',
+              fontSize: '13px',
+              lineHeight: '1.75',
+              letterSpacing: '0.01em',
+              color: '#5CFF6A',
             }}
           >
             {POST_LINES.slice(0, visibleLines).map((line, i) => (
@@ -139,8 +133,8 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
                   opacity: line === '' ? 0 : 1,
                   textShadow:
                     i === flashLine
-                      ? '0 0 12px #33FF33, 0 0 24px #33FF33'
-                      : '0 0 6px rgba(51, 255, 51, 0.35)',
+                      ? '0 0 12px #5CFF6A, 0 0 24px #5CFF6A'
+                      : '0 0 6px rgba(92, 255, 106, 0.28)',
                   transition: 'text-shadow 60ms ease',
                 }}
               >
@@ -152,7 +146,6 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
             )}
           </div>
 
-          {/* Scanline overlay */}
           <div className="boot-scanlines" />
         </>
       )}
@@ -162,25 +155,17 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
           className="fixed inset-0 flex flex-col items-center justify-center"
           style={{ background: '#000000' }}
         >
-          {/* Apple logo */}
-          <svg
-            width="56"
-            height="68"
-            viewBox="0 0 17 20"
-            fill="#f5f5f7"
-            className="boot-logo-appear"
-          >
-            <path d="M13.784 10.286c-.027-2.617 2.136-3.874 2.232-3.935-1.214-1.776-3.105-2.02-3.778-2.047-1.608-.163-3.14.947-3.956.947-.816 0-2.078-.922-3.414-.898-1.757.026-3.377 1.022-4.282 2.596-1.825 3.168-.467 7.862 1.312 10.434.87 1.258 1.906 2.672 3.268 2.622 1.312-.053 1.808-.849 3.394-.849 1.586 0 2.032.849 3.42.822 1.41-.024 2.306-1.282 3.172-2.543.998-1.459 1.41-2.87 1.436-2.943-.032-.013-2.757-1.058-2.784-4.197l-.02-.01zM11.147 2.842C11.874 1.96 12.366.768 12.234-.41c-1.016.041-2.248.677-2.977 1.532-.654.756-1.226 1.964-1.072 3.124 1.134.088 2.29-.576 2.962-1.404z" />
-          </svg>
+          <div className="boot-logo-appear">
+            <RahulOSMark size={56} variant="splash" />
+          </div>
 
-          {/* Progress bar */}
           <div
             style={{
-              marginTop: '28px',
-              width: '200px',
+              marginTop: '36px',
+              width: '168px',
               height: '3px',
-              borderRadius: '1.5px',
-              background: 'rgba(255, 255, 255, 0.15)',
+              borderRadius: '2px',
+              background: 'rgba(255, 255, 255, 0.12)',
               overflow: 'hidden',
             }}
           >
@@ -188,7 +173,7 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
               style={{
                 width: `${splashProgress * 100}%`,
                 height: '100%',
-                borderRadius: '1.5px',
+                borderRadius: '2px',
                 background: '#f5f5f7',
                 transition: 'none',
               }}
@@ -200,12 +185,12 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
       <style>{`
         .boot-cursor {
           display: inline-block;
-          width: 8px;
-          height: 16px;
-          background: #33FF33;
+          width: 7px;
+          height: 15px;
+          background: #5CFF6A;
           animation: boot-blink 0.7s step-end infinite;
           vertical-align: text-bottom;
-          box-shadow: 0 0 8px rgba(51, 255, 51, 0.5);
+          box-shadow: 0 0 8px rgba(92, 255, 106, 0.45);
         }
 
         .boot-scanlines {
@@ -233,8 +218,8 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
           z-index: 11;
           background: radial-gradient(
             ellipse at center,
-            transparent 60%,
-            rgba(0, 0, 0, 0.45) 100%
+            transparent 58%,
+            rgba(0, 0, 0, 0.5) 100%
           );
         }
 
@@ -243,7 +228,7 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
         }
 
         .boot-logo-appear {
-          animation: boot-logo-in 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+          animation: boot-logo-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
         }
 
         @keyframes crt-flicker {
@@ -262,8 +247,8 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
         }
 
         @keyframes boot-logo-in {
-          from { opacity: 0; transform: scale(0.8); }
-          to { opacity: 0.9; transform: scale(1); }
+          from { opacity: 0; transform: scale(0.92); }
+          to { opacity: 0.92; transform: scale(1); }
         }
       `}</style>
     </div>

@@ -261,11 +261,11 @@ export function Terminal({ windowId }: { windowId: string }) {
       style={{
         width: '100%',
         height: '100%',
-        backgroundColor: '#1e1e1e',
+        backgroundColor: '#161616',
         fontFamily: 'var(--font-mono)',
         fontSize: '13px',
-        lineHeight: '1.5',
-        color: '#CCCCCC',
+        lineHeight: '1.6',
+        color: '#C8C8CC',
         display: 'flex',
         flexDirection: 'column',
         cursor: 'text',
@@ -276,7 +276,7 @@ export function Terminal({ windowId }: { windowId: string }) {
         style={{
           flex: 1,
           overflowY: 'auto',
-          padding: '12px',
+          padding: '16px 18px',
           minHeight: 0,
         }}
       >

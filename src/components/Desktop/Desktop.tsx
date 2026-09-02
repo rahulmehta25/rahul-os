@@ -14,6 +14,7 @@ import { VoiceOverlay } from '../Voice/VoiceOverlay.tsx';
 import { AboutModal } from '../../apps/AboutThisComputer/About.tsx';
 import { appRegistry } from '../../apps/registry.tsx';
 import { useWindowKeyboard } from '../../hooks/useWindowKeyboard.ts';
+import { DEFAULT_WALLPAPER, SEQUOIA_DARK, SEQUOIA_LIGHT } from '../../styles/wallpapers.ts';
 
 function AppLoader({ appId, windowId, appProps }: { appId: string; windowId: string; appProps?: Record<string, unknown> }) {
   const manifest = appRegistry[appId];
@@ -69,10 +70,6 @@ function WindowManager() {
   );
 }
 
-const SEQUOIA_DARK = 'radial-gradient(ellipse at 75% 85%, #F5872A 0%, #D4692A 8%, #8B6E35 16%, #3E8F4A 26%, #1A9068 36%, #0D7B7A 46%, #0B5A6E 56%, #142D50 68%, #2A1F5C 80%, #3C2068 90%, #281548 100%)';
-const SEQUOIA_LIGHT = 'radial-gradient(ellipse at 75% 85%, #FDCFA1 0%, #F4BC90 8%, #D6CC94 16%, #96D8A6 26%, #7AD4B8 36%, #78C8C8 46%, #82BCD2 56%, #94B4D8 68%, #B4A4D8 80%, #C8B0E0 90%, #BAA4D6 100%)';
-const DEFAULT_WALLPAPER = SEQUOIA_DARK;
-
 export function Desktop() {
   const wallpaper = useSettingsStore((s) => s.wallpaper);
   const theme = useSettingsStore((s) => s.theme);
@@ -94,15 +91,15 @@ export function Desktop() {
     const t1 = setTimeout(() => {
       push({
         title: 'Welcome to RahulOS',
-        body: 'Open apps from the dock, browse Files, or press Cmd+K for voice.',
+        body: 'Open apps from the Dock, or press Cmd+K for voice.',
         duration: 6000,
       });
     }, 2000);
 
     const t2 = setTimeout(() => {
       push({
-        title: 'Projects live in Files',
-        body: 'Open Files from the dock, then open the Projects folder.',
+        title: 'Projects',
+        body: 'Open Files from the Dock to browse work.',
         duration: 5000,
       });
     }, 60000);
@@ -119,8 +116,8 @@ export function Desktop() {
     if (hasTerminal) {
       terminalHintFired.current = true;
       push({
-        title: 'Terminal Tip',
-        body: 'Try "help" to see available commands, or "projects" to browse work.',
+        title: 'Terminal',
+        body: 'Type help for commands, or projects to browse work.',
         duration: 5000,
       });
     }
@@ -137,12 +134,18 @@ export function Desktop() {
           : (wallpaper || DEFAULT_WALLPAPER),
       }}
     >
-      {/* Subtle noise texture overlay */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          opacity: 0.03,
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+          opacity: 0.04,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+        }}
+      />
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            'radial-gradient(ellipse at 50% 38%, transparent 42%, rgba(0,0,0,0.22) 100%)',
         }}
       />
 

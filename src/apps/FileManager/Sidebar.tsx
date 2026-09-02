@@ -81,8 +81,9 @@ function SidebarItem({
       style={{
         padding: '5px 10px',
         margin: '1px 6px',
-        borderRadius: '6px',
-        fontSize: '13px',
+        borderRadius: '7px',
+        fontSize: 'var(--text-md)',
+        letterSpacing: 'var(--tracking-snug)',
         color: isActive ? '#fff' : 'var(--color-text-secondary)',
         background: isActive ? 'var(--color-accent)' : 'transparent',
         cursor: 'default',
@@ -117,20 +118,15 @@ export function Sidebar({ currentPath, onNavigate }: SidebarProps) {
       className="flex flex-col h-full overflow-y-auto"
       style={{
         width: '200px',
-        borderRight: '1px solid var(--color-border)',
-        backgroundColor: 'var(--color-bg-surface-solid)',
-        background: 'var(--color-bg-surface-solid)',
+        borderRight: '0.5px solid var(--color-border)',
+        background: 'var(--color-bg-sidebar)',
         fontFamily: 'var(--font-system)',
       }}
     >
       <div
+        className="label-quiet"
         style={{
-          fontSize: '11px',
-          fontWeight: 600,
-          color: 'var(--color-text-tertiary)',
-          textTransform: 'uppercase',
-          letterSpacing: '0.5px',
-          padding: '10px 14px 4px',
+          padding: '14px 16px 6px',
           userSelect: 'none',
         }}
       >
@@ -153,13 +149,9 @@ export function Sidebar({ currentPath, onNavigate }: SidebarProps) {
         }}
       />
       <div
+        className="label-quiet"
         style={{
-          fontSize: '11px',
-          fontWeight: 600,
-          color: 'var(--color-text-tertiary)',
-          textTransform: 'uppercase',
-          letterSpacing: '0.5px',
-          padding: '12px 14px 4px',
+          padding: '14px 16px 6px',
           userSelect: 'none',
         }}
       >

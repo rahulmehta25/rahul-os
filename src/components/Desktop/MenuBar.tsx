@@ -2,6 +2,7 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { useWindowStore } from '../../stores/windowStore.ts';
 import { useModalStore } from '../../stores/modalStore.ts';
 import { appRegistry } from '../../apps/registry.tsx';
+import { RahulOSMark } from '../shared/RahulOSMark.tsx';
 
 type MenuId = 'apple' | 'app' | 'File' | 'Edit' | 'View' | 'Window' | 'Help' | null;
 
@@ -99,7 +100,7 @@ export function MenuBar() {
     const text = document.createElement('div');
     text.textContent = 'You can close this tab.';
     text.style.cssText =
-      'color:#86868b;font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:18px;font-weight:300;opacity:0;transition:opacity 1.5s ease 0.8s';
+      'color:#a1a1a6;font-family:var(--font-system);font-size:15px;font-weight:400;letter-spacing:-0.014em;opacity:0;transition:opacity 1.5s ease 0.8s';
     overlay.appendChild(text);
     document.body.appendChild(overlay);
     requestAnimationFrame(() => {
@@ -127,28 +128,28 @@ export function MenuBar() {
       style={{
         height: 'var(--menubar-height)',
         background: 'var(--color-bg-menubar)',
-        backdropFilter: 'blur(30px) saturate(1.8)',
-        WebkitBackdropFilter: 'blur(30px) saturate(1.8)',
+        backdropFilter: 'var(--glass-blur)',
+        WebkitBackdropFilter: 'var(--glass-blur)',
         borderBottom: '0.5px solid var(--color-border)',
         boxShadow: 'var(--shadow-menubar)',
         zIndex: 'var(--z-menubar)',
         fontFamily: 'var(--font-system)',
-        fontSize: '13px',
-        fontWeight: 400,
+        fontSize: 'var(--text-md)',
+        fontWeight: 'var(--weight-regular)',
+        letterSpacing: 'var(--tracking-snug)',
         color: 'var(--color-text-primary)',
-        paddingLeft: '6px',
-        paddingRight: '8px',
+        paddingLeft: '8px',
+        paddingRight: '10px',
+        animation: 'chrome-fade 400ms ease both',
       }}
     >
-      {/* Left side: Apple logo + active app name + menus */}
       <div className="flex items-center" style={{ height: '100%' }} ref={menuBarRef} data-menubar>
-        {/* Apple menu */}
         <MenuBarButton
           isOpen={openMenu === 'apple'}
           onClick={() => handleMenuClick('apple')}
           onMouseEnter={() => handleMenuHover('apple')}
         >
-          <AppleIcon />
+          <RahulOSMark size={13} />
         </MenuBarButton>
 
         {openMenu === 'apple' && (
@@ -248,7 +249,6 @@ export function MenuBar() {
         )}
       </div>
 
-      {/* Right side: Voice hint + status icons + Date/Time */}
       <div
         className="flex items-center"
         style={{
@@ -267,13 +267,13 @@ export function MenuBar() {
         <StatusButton label="Battery: 100%">
           <span className="flex items-center" style={{ gap: '4px' }}>
             <BatteryIcon />
-            <span style={{ fontSize: '12px', fontWeight: 500 }}>100%</span>
+            <span style={{ fontSize: 'var(--text-xs)', fontWeight: 400, fontVariantNumeric: 'tabular-nums' }}>100%</span>
           </span>
         </StatusButton>
         <StatusButton label={dateStr}>
-          <div className="flex items-center" style={{ gap: '6px', fontSize: '13px', padding: '0 4px' }}>
+          <div className="flex items-center" style={{ gap: '8px', fontSize: 'var(--text-sm)', padding: '0 4px', fontVariantNumeric: 'tabular-nums' }}>
             <span style={{ fontWeight: 400 }}>{dateStr}</span>
-            <span style={{ fontWeight: 600 }}>{formatted}</span>
+            <span style={{ fontWeight: 500 }}>{formatted}</span>
           </div>
         </StatusButton>
       </div>
@@ -303,13 +303,14 @@ function MenuBarButton({
       className="flex items-center border-none cursor-default"
       style={{
         height: '100%',
-        padding: '0 10px',
+        padding: '0 11px',
         background: isOpen ? 'var(--color-bg-active)' : hovered ? 'var(--color-bg-hover)' : 'transparent',
-        borderRadius: '6px',
+        borderRadius: '5px',
         color: 'var(--color-text-primary)',
         fontFamily: 'var(--font-system)',
-        fontSize: '13px',
-        fontWeight: bold ? 600 : 400,
+        fontSize: 'var(--text-md)',
+        letterSpacing: 'var(--tracking-snug)',
+        fontWeight: bold ? 590 : 400,
         lineHeight: 1,
         transition: 'background 60ms ease',
       }}
@@ -329,25 +330,19 @@ function MenuDropdown({ children, left }: { children: React.ReactNode; left: num
         position: 'absolute',
         top: 'var(--menubar-height)',
         left,
-        width: 200,
+        width: 220,
         background: 'var(--color-bg-surface)',
-        backdropFilter: 'blur(40px) saturate(1.8)',
-        WebkitBackdropFilter: 'blur(40px) saturate(1.8)',
+        backdropFilter: 'var(--glass-blur)',
+        WebkitBackdropFilter: 'var(--glass-blur)',
         borderRadius: 'var(--radius-context-menu)',
         border: '0.5px solid var(--color-border-active)',
         boxShadow: 'var(--shadow-context-menu)',
-        padding: '4px 0',
+        padding: '6px 0',
         zIndex: 9999,
-        animation: 'menuDropIn 80ms ease-out',
+        animation: 'chrome-rise-sm var(--rise-chrome) both',
       }}
     >
       {children}
-      <style>{`
-        @keyframes menuDropIn {
-          from { opacity: 0; transform: translateY(-2px) scale(0.98); }
-          to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-      `}</style>
     </div>
   );
 }
@@ -422,7 +417,7 @@ function MenuItem({ label, shortcut, onClick }: { label: string; shortcut?: stri
       style={{
         color: hovered ? '#ffffff' : 'var(--color-text-primary)',
         background: hovered ? 'var(--color-accent)' : 'transparent',
-        borderRadius: hovered ? 4 : 0,
+        borderRadius: hovered ? 6 : 0,
         margin: hovered ? '0 4px' : 0,
         width: hovered ? 'calc(100% - 8px)' : '100%',
         display: 'flex',
@@ -431,9 +426,10 @@ function MenuItem({ label, shortcut, onClick }: { label: string; shortcut?: stri
         border: 'none',
         cursor: 'default',
         fontFamily: 'var(--font-system)',
-        fontSize: '13px',
-        lineHeight: '20px',
-        padding: '3px 12px',
+        fontSize: 'var(--text-md)',
+        letterSpacing: 'var(--tracking-snug)',
+        lineHeight: '22px',
+        padding: '4px 14px',
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -457,9 +453,10 @@ function MenuItemDisabled({ label, shortcut }: { label: string; shortcut?: strin
         justifyContent: 'space-between',
         alignItems: 'center',
         fontFamily: 'var(--font-system)',
-        fontSize: '13px',
-        lineHeight: '20px',
-        padding: '3px 12px',
+        fontSize: 'var(--text-md)',
+        letterSpacing: 'var(--tracking-snug)',
+        lineHeight: '22px',
+        padding: '4px 14px',
         color: 'var(--color-text-tertiary)',
         cursor: 'default',
       }}
@@ -476,7 +473,7 @@ function MenuItemDisabled({ label, shortcut }: { label: string; shortcut?: strin
 
 function MenuSeparator() {
   return (
-    <div style={{ height: 1, background: 'var(--color-border)', margin: '4px 8px' }} />
+    <div style={{ height: 0.5, background: 'var(--color-border)', margin: '5px 10px' }} />
   );
 }
 
@@ -499,7 +496,7 @@ function StatusButton({
         height: '22px',
         padding: '0 8px',
         background: hovered ? 'var(--color-bg-hover)' : 'transparent',
-        borderRadius: '6px',
+        borderRadius: '5px',
         color: 'var(--color-text-primary)',
         transition: 'background 80ms ease',
       }}
@@ -525,11 +522,12 @@ function VoiceHintButton() {
         padding: '0 8px',
         gap: '5px',
         background: hovered ? 'var(--color-bg-hover)' : 'transparent',
-        borderRadius: '6px',
+        borderRadius: '5px',
         color: 'var(--color-text-primary)',
         fontFamily: 'var(--font-system)',
-        fontSize: '12px',
-        fontWeight: 500,
+        fontSize: 'var(--text-xs)',
+        fontWeight: 'var(--weight-medium)',
+        letterSpacing: 'var(--tracking-snug)',
         cursor: 'pointer',
         transition: 'background 80ms ease',
       }}
@@ -543,9 +541,9 @@ function VoiceHintButton() {
         style={{
           fontFamily: 'var(--font-system)',
           fontSize: '10px',
-          fontWeight: 600,
-          opacity: 0.55,
-          letterSpacing: '0.02em',
+          fontWeight: 500,
+          color: 'var(--color-text-secondary)',
+          letterSpacing: '0.04em',
         }}
       >
         ⌘K
@@ -573,19 +571,6 @@ function MicIcon() {
   );
 }
 
-function AppleIcon() {
-  return (
-    <svg
-      width="12"
-      height="14"
-      viewBox="0 0 17 20"
-      fill="currentColor"
-      style={{ display: 'block' }}
-    >
-      <path d="M13.784 10.286c-.027-2.617 2.136-3.874 2.232-3.935-1.214-1.776-3.105-2.02-3.778-2.047-1.608-.163-3.14.947-3.956.947-.816 0-2.078-.922-3.414-.898-1.757.026-3.377 1.022-4.282 2.596-1.825 3.168-.467 7.862 1.312 10.434.87 1.258 1.906 2.672 3.268 2.622 1.312-.053 1.808-.849 3.394-.849 1.586 0 2.032.849 3.42.822 1.41-.024 2.306-1.282 3.172-2.543.998-1.459 1.41-2.87 1.436-2.943-.032-.013-2.757-1.058-2.784-4.197l-.02-.01zM11.147 2.842C11.874 1.96 12.366.768 12.234-.41c-1.016.041-2.248.677-2.977 1.532-.654.756-1.226 1.964-1.072 3.124 1.134.088 2.29-.576 2.962-1.404z" />
-    </svg>
-  );
-}
 
 function ControlCenterIcon() {
   return (

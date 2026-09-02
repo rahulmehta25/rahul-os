@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useSettingsStore } from '../../stores/settingsStore.ts';
+import { RahulOSMark } from '../../components/shared/RahulOSMark.tsx';
+import { SEQUOIA_DARK, SEQUOIA_LIGHT } from '../../styles/wallpapers.ts';
 
 const WALLPAPERS = [
   {
     name: 'Sequoia',
-    value: 'radial-gradient(ellipse at 75% 85%, #F5872A 0%, #D4692A 8%, #8B6E35 16%, #3E8F4A 26%, #1A9068 36%, #0D7B7A 46%, #0B5A6E 56%, #142D50 68%, #2A1F5C 80%, #3C2068 90%, #281548 100%)',
-    lightValue: 'radial-gradient(ellipse at 75% 85%, #FDCFA1 0%, #F4BC90 8%, #D6CC94 16%, #96D8A6 26%, #7AD4B8 36%, #78C8C8 46%, #82BCD2 56%, #94B4D8 68%, #B4A4D8 80%, #C8B0E0 90%, #BAA4D6 100%)',
+    value: SEQUOIA_DARK,
+    lightValue: SEQUOIA_LIGHT,
   },
   {
     name: 'Midnight',
@@ -43,11 +45,11 @@ const ACCENT_COLORS = [
 ];
 
 const TECH_STACK = [
-  { label: 'React', color: '#61DAFB' },
-  { label: 'TypeScript', color: '#3178C6' },
-  { label: 'Vite', color: '#646CFF' },
-  { label: 'Zustand', color: '#443E38' },
-  { label: 'Tailwind', color: '#06B6D4' },
+  { label: 'React' },
+  { label: 'TypeScript' },
+  { label: 'Vite' },
+  { label: 'Zustand' },
+  { label: 'Tailwind' },
 ];
 
 type Section = 'general' | 'appearance' | 'notifications' | 'about';
@@ -131,9 +133,9 @@ export function Settings() {
         className="flex flex-col shrink-0"
         style={{
           width: '210px',
-          padding: '10px 10px',
+          padding: '12px 10px',
           borderRight: '0.5px solid var(--color-border)',
-          background: 'var(--color-bg-input)',
+          background: 'var(--color-bg-sidebar)',
           gap: '2px',
         }}
       >
@@ -199,10 +201,10 @@ export function Settings() {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto" style={{ padding: '20px 24px', background: 'transparent' }}>
+      <div className="flex-1 overflow-y-auto" style={{ padding: '28px 32px', background: 'transparent' }}>
         {section === 'appearance' && (
           <div className="flex flex-col gap-5" style={{ maxWidth: '480px' }}>
-            <h2 style={{ fontSize: '20px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '4px' }}>
+            <h2 className="title-display" style={{ marginBottom: '8px' }}>
               Appearance
             </h2>
 
@@ -331,7 +333,7 @@ export function Settings() {
 
         {(section === 'general' || section === 'notifications') && (
           <div className="flex flex-col gap-5" style={{ maxWidth: '480px' }}>
-            <h2 style={{ fontSize: '20px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '4px' }}>
+            <h2 className="title-display" style={{ marginBottom: '8px' }}>
               {section === 'general' ? 'General' : 'Notifications'}
             </h2>
             <SettingsGroup>
@@ -360,14 +362,14 @@ export function Settings() {
         {section === 'about' && (
           <div className="flex flex-col gap-5" style={{ maxWidth: '420px' }}>
             {/* Hero */}
-            <div className="flex flex-col items-center gap-2" style={{ padding: '12px 0 8px' }}>
-              <svg width="52" height="62" viewBox="0 0 17 20" fill="var(--color-text-primary)" style={{ opacity: 0.8 }}>
-                <path d="M13.784 10.286c-.027-2.617 2.136-3.874 2.232-3.935-1.214-1.776-3.105-2.02-3.778-2.047-1.608-.163-3.14.947-3.956.947-.816 0-2.078-.922-3.414-.898-1.757.026-3.377 1.022-4.282 2.596-1.825 3.168-.467 7.862 1.312 10.434.87 1.258 1.906 2.672 3.268 2.622 1.312-.053 1.808-.849 3.394-.849 1.586 0 2.032.849 3.42.822 1.41-.024 2.306-1.282 3.172-2.543.998-1.459 1.41-2.87 1.436-2.943-.032-.013-2.757-1.058-2.784-4.197l-.02-.01zM11.147 2.842C11.874 1.96 12.366.768 12.234-.41c-1.016.041-2.248.677-2.977 1.532-.654.756-1.226 1.964-1.072 3.124 1.134.088 2.29-.576 2.962-1.404z" />
-              </svg>
-              <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--color-text-primary)' }}>
+            <div className="flex flex-col items-center" style={{ padding: '16px 0 12px', gap: '10px' }}>
+              <div style={{ color: 'var(--color-text-primary)' }}>
+                <RahulOSMark size={40} variant="splash" />
+              </div>
+              <div style={{ fontSize: 'var(--text-xl)', fontWeight: 500, letterSpacing: 'var(--tracking-tight)', color: 'var(--color-text-primary)' }}>
                 RahulOS
               </div>
-              <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>
+              <div className="label-quiet">
                 Version 1.0.0
               </div>
             </div>
@@ -376,33 +378,18 @@ export function Settings() {
             <SettingsGroup title="System Information">
               <div className="flex flex-col" style={{ gap: '10px', padding: '2px 0' }}>
                 <SettingsRow label="Built by" value="Rahul Mehta" />
-                <SettingsRow label="Chip" value="Apple M-Series Virtual" />
+                <SettingsRow label="Chip" value="Virtual Core" />
                 <SettingsRow label="Memory" value="16 GB" />
                 <SettingsRow label="Storage" value="256 GB SSD" />
-                <SettingsRow label="Uptime" value={formatUptime(uptime)} accent />
+                <SettingsRow label="Uptime" value={formatUptime(uptime)} />
               </div>
             </SettingsGroup>
 
             {/* Tech stack */}
             <SettingsGroup title="Tech Stack">
-              <div className="flex flex-wrap" style={{ gap: '6px', padding: '2px 0' }}>
+              <div className="flex flex-wrap" style={{ gap: '8px', padding: '2px 0' }}>
                 {TECH_STACK.map((t) => (
-                  <span
-                    key={t.label}
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '5px',
-                      padding: '3px 10px',
-                      borderRadius: '12px',
-                      fontSize: '11px',
-                      fontWeight: 500,
-                      background: `${t.color}18`,
-                      color: t.color,
-                      border: `0.5px solid ${t.color}30`,
-                    }}
-                  >
-                    <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: t.color }} />
+                  <span key={t.label} className="chip-quiet">
                     {t.label}
                   </span>
                 ))}
@@ -455,19 +442,12 @@ function SettingsGroup({ title, children }: { title?: string; children: React.Re
       style={{
         background: 'var(--color-bg-hover)',
         borderRadius: '12px',
-        padding: '14px 16px',
+        padding: '16px 18px',
         border: '0.5px solid var(--color-border)',
       }}
     >
       {title && (
-        <div style={{
-          fontWeight: 500,
-          fontSize: '12px',
-          color: 'var(--color-text-secondary)',
-          marginBottom: '10px',
-          textTransform: 'uppercase',
-          letterSpacing: '0.03em',
-        }}>
+        <div className="label-quiet" style={{ marginBottom: '12px' }}>
           {title}
         </div>
       )}

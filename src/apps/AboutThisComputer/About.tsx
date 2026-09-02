@@ -1,14 +1,9 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useWindowStore } from '../../stores/windowStore.ts';
 import { useModalStore } from '../../stores/modalStore.ts';
+import { RahulOSMark } from '../../components/shared/RahulOSMark.tsx';
 
-const TECH_STACK = [
-  { name: 'React', color: '#61dafb' },
-  { name: 'TypeScript', color: '#3178c6' },
-  { name: 'Zustand', color: '#f9e2af' },
-  { name: 'Vite', color: '#bd34fe' },
-  { name: 'Tailwind', color: '#38bdf8' },
-];
+const TECH_STACK = ['React', 'TypeScript', 'Zustand', 'Vite', 'Tailwind'];
 
 const LINKS = [
   { label: 'GitHub', href: 'https://github.com/rahulmehta25' },
@@ -59,40 +54,54 @@ export function AboutModal() {
       className="fixed inset-0 flex items-center justify-center"
       style={{
         zIndex: 'var(--z-modal)',
-        background: 'rgba(0,0,0,0.5)',
-        backdropFilter: 'blur(8px)',
-        WebkitBackdropFilter: 'blur(8px)',
-        animation: 'about-fade-in 0.2s ease-out',
+        background: 'var(--color-bg-overlay)',
+        backdropFilter: 'blur(16px) saturate(140%)',
+        WebkitBackdropFilter: 'blur(16px) saturate(140%)',
+        animation: 'chrome-fade 220ms ease-out',
       }}
       onClick={(e) => {
         if (e.target === e.currentTarget) closeModal();
       }}
     >
       <div
-        className="relative flex flex-col items-center gap-4 p-8 rounded-2xl"
+        className="relative flex flex-col items-center"
         style={{
           fontFamily: 'var(--font-system)',
-          background: 'var(--color-bg-surface-solid)',
-          border: '1px solid var(--color-border-active)',
-          boxShadow: '0 24px 80px rgba(0,0,0,0.5)',
-          width: '420px',
-          animation: 'about-scale-in 0.2s ease-out',
+          background: 'var(--color-bg-surface)',
+          backdropFilter: 'var(--glass-blur)',
+          WebkitBackdropFilter: 'var(--glass-blur)',
+          border: '0.5px solid var(--color-border-active)',
+          boxShadow: 'var(--shadow-window-active)',
+          width: '400px',
+          padding: '36px 32px 28px',
+          borderRadius: '18px',
+          animation: 'chrome-rise var(--rise-panel) both',
+          gap: '8px',
         }}
       >
-        {/* Close button */}
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            inset: 0,
+            borderRadius: 'inherit',
+            pointerEvents: 'none',
+            boxShadow: 'var(--glass-highlight)',
+          }}
+        />
+
         <button
           onClick={closeModal}
           className="absolute top-3 right-3 rounded-full flex items-center justify-center"
           style={{
-            width: '20px',
-            height: '20px',
+            width: '18px',
+            height: '18px',
             background: 'var(--color-bg-active)',
             color: 'var(--color-text-tertiary)',
             border: 'none',
             cursor: 'pointer',
             fontSize: '12px',
             lineHeight: 1,
-            transition: 'background 100ms',
           }}
           onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--color-close)'; e.currentTarget.style.color = '#fff'; }}
           onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--color-bg-active)'; e.currentTarget.style.color = 'var(--color-text-tertiary)'; }}
@@ -101,47 +110,41 @@ export function AboutModal() {
           ×
         </button>
 
-        {/* Logo */}
+        <div style={{ color: 'var(--color-text-primary)', marginBottom: '4px' }}>
+          <RahulOSMark size={36} variant="splash" />
+        </div>
+
         <div
           style={{
-            fontSize: '28px',
-            fontWeight: 700,
+            fontSize: 'var(--text-xl)',
+            fontWeight: 500,
+            letterSpacing: 'var(--tracking-tight)',
             color: 'var(--color-text-primary)',
-            letterSpacing: '-0.5px',
           }}
         >
           RahulOS
         </div>
 
-        <div style={{ color: 'var(--color-text-secondary)', fontSize: '13px' }}>
+        <div
+          className="label-quiet"
+          style={{ marginTop: '2px' }}
+        >
           Version 1.0
         </div>
 
-        <div style={{ color: 'var(--color-text-tertiary)', fontSize: '12px' }}>
+        <div style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--text-sm)', marginTop: '4px' }}>
           Built by Rahul Mehta
         </div>
 
-        {/* Tech stack badges */}
-        <div className="flex flex-wrap justify-center gap-2 mt-1">
+        <div className="flex flex-wrap justify-center" style={{ gap: '8px', marginTop: '20px' }}>
           {TECH_STACK.map((tech) => (
-            <span
-              key={tech.name}
-              className="px-2.5 py-1 rounded-full"
-              style={{
-                fontSize: '11px',
-                fontWeight: 500,
-                color: tech.color,
-                background: `${tech.color}15`,
-                border: `1px solid ${tech.color}30`,
-              }}
-            >
-              {tech.name}
+            <span key={tech} className="chip-quiet">
+              {tech}
             </span>
           ))}
         </div>
 
-        {/* Links */}
-        <div className="flex gap-4 mt-1">
+        <div className="flex" style={{ gap: '18px', marginTop: '16px' }}>
           {LINKS.map((link) => (
             <a
               key={link.label}
@@ -150,8 +153,9 @@ export function AboutModal() {
               rel="noopener noreferrer"
               style={{
                 color: 'var(--color-accent)',
-                fontSize: '12px',
+                fontSize: 'var(--text-sm)',
                 textDecoration: 'none',
+                letterSpacing: 'var(--tracking-snug)',
               }}
             >
               {link.label}
@@ -159,63 +163,46 @@ export function AboutModal() {
           ))}
         </div>
 
-        {/* Stats */}
         <div
-          className="flex gap-6 mt-2 px-4 py-2.5 rounded-lg"
+          className="flex"
           style={{
+            gap: '28px',
+            marginTop: '20px',
+            padding: '12px 20px',
+            borderRadius: '12px',
             background: 'var(--color-bg-input)',
-            border: '1px solid var(--color-border)',
+            border: '0.5px solid var(--color-border)',
           }}
         >
           <div className="text-center">
-            <div style={{ color: 'var(--color-text-tertiary)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              Uptime
-            </div>
-            <div style={{ color: 'var(--color-text-primary)', fontSize: '13px', fontFamily: 'var(--font-mono)', fontWeight: 500, marginTop: '2px' }}>
+            <div className="label-quiet">Uptime</div>
+            <div style={{ color: 'var(--color-text-primary)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-mono)', fontWeight: 500, marginTop: '4px', fontVariantNumeric: 'tabular-nums' }}>
               {uptime}
             </div>
           </div>
           <div className="text-center">
-            <div style={{ color: 'var(--color-text-tertiary)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              Windows
-            </div>
-            <div style={{ color: 'var(--color-text-primary)', fontSize: '13px', fontFamily: 'var(--font-mono)', fontWeight: 500, marginTop: '2px' }}>
+            <div className="label-quiet">Windows</div>
+            <div style={{ color: 'var(--color-text-primary)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-mono)', fontWeight: 500, marginTop: '4px', fontVariantNumeric: 'tabular-nums' }}>
               {windowCount}
             </div>
           </div>
         </div>
       </div>
-
-      <style>{`
-        @keyframes about-fade-in {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        @keyframes about-scale-in {
-          from { opacity: 0; transform: scale(0.95); }
-          to { opacity: 1; transform: scale(1); }
-        }
-      `}</style>
     </div>
   );
 }
 
-// Keep the old export for the registry (won't be used as a window anymore)
 export function About() {
   return (
     <div
-      className="flex flex-col items-center justify-center h-full gap-4 p-6"
-      style={{ fontFamily: 'var(--font-system)' }}
+      className="flex flex-col items-center justify-center h-full"
+      style={{ fontFamily: 'var(--font-system)', gap: '8px', padding: '24px' }}
     >
-      <div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--color-text-primary)' }}>
+      <RahulOSMark size={36} variant="splash" />
+      <div style={{ fontSize: 'var(--text-xl)', fontWeight: 500, letterSpacing: 'var(--tracking-tight)', color: 'var(--color-text-primary)' }}>
         RahulOS
       </div>
-      <div style={{ color: 'var(--color-text-secondary)', fontSize: '13px' }}>
-        Version 1.0
-      </div>
-      <div style={{ color: 'var(--color-text-tertiary)', fontSize: '12px' }}>
-        Built by Rahul Mehta
-      </div>
+      <div className="label-quiet">Version 1.0</div>
     </div>
   );
 }

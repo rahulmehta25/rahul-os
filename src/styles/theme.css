@@ -1,81 +1,125 @@
 :root {
-  /* Background & Surface — macOS Sequoia dark */
-  --color-bg-desktop: #1a1a1a;
-  --color-bg-surface: rgba(38, 38, 38, 0.97);
-  --color-bg-surface-solid: #282828;
-  --color-bg-titlebar: rgba(50, 50, 50, 0.97);
-  --color-bg-titlebar-inactive: rgba(46, 46, 46, 0.92);
-  --color-bg-dock: rgba(40, 40, 40, 0.55);
-  --color-bg-menubar: rgba(30, 30, 30, 0.72);
+  /* Surfaces: glass fills, translucent enough for wallpaper to read through */
+  --color-bg-desktop: #141218;
+  --color-bg-surface: rgba(32, 32, 34, 0.58);
+  --color-bg-surface-solid: rgba(28, 28, 30, 0.88);
+  --color-bg-surface-inactive: rgba(28, 28, 30, 0.48);
+  --color-bg-titlebar: rgba(48, 48, 50, 0.38);
+  --color-bg-titlebar-inactive: rgba(40, 40, 42, 0.28);
+  --color-bg-sidebar: rgba(24, 24, 26, 0.42);
+  --color-bg-dock: rgba(28, 28, 30, 0.38);
+  --color-bg-menubar: rgba(22, 22, 24, 0.42);
   --color-bg-input: rgba(255, 255, 255, 0.06);
-  --color-bg-hover: rgba(255, 255, 255, 0.08);
+  --color-bg-hover: rgba(255, 255, 255, 0.07);
   --color-bg-active: rgba(255, 255, 255, 0.12);
+  --color-bg-overlay: rgba(8, 8, 10, 0.42);
 
-  /* Text — Apple system colors */
+  /* Text */
   --color-text-primary: #f5f5f7;
   --color-text-secondary: #a1a1a6;
   --color-text-tertiary: #6e6e73;
   --color-text-inverse: #1d1d1f;
 
-  /* Accent — macOS Blue */
+  /* Accent */
   --color-accent: #0A84FF;
   --color-accent-hover: #409CFF;
-  --color-accent-subtle: rgba(10, 132, 255, 0.15);
+  --color-accent-subtle: rgba(10, 132, 255, 0.16);
 
-  /* Traffic lights — exact macOS colors */
+  /* Traffic lights */
   --color-close: #FF5F57;
   --color-minimize: #FEBC2E;
   --color-maximize: #28C840;
   --color-traffic-inactive: #3C3C3C;
 
-  /* Borders */
+  /* Borders: hairline glass edges */
   --color-border: rgba(255, 255, 255, 0.1);
-  --color-border-active: rgba(255, 255, 255, 0.16);
+  --color-border-active: rgba(255, 255, 255, 0.18);
 
-  /* Shadows — macOS Sequoia layered shadow system */
+  /* Glass material */
+  --glass-blur: blur(48px) saturate(180%);
+  --glass-blur-dock: blur(36px) saturate(190%);
+  --glass-highlight:
+    inset 0 0.5px 0 rgba(255, 255, 255, 0.28),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.08);
+  --glass-highlight-strong:
+    inset 0 0.6px 0 rgba(255, 255, 255, 0.34),
+    inset 0 -0.5px 0 rgba(0, 0, 0, 0.18),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.1);
+
+  /* Shadows: soft, layered, no hard edges */
   --shadow-window:
-    0 0 0 0.5px rgba(0, 0, 0, 0.18),
-    0 2px 4px rgba(0, 0, 0, 0.06),
-    0 8px 24px rgba(0, 0, 0, 0.09),
-    0 24px 48px rgba(0, 0, 0, 0.12);
+    0 0 0 0.5px rgba(0, 0, 0, 0.28),
+    0 2px 6px rgba(0, 0, 0, 0.08),
+    0 10px 28px rgba(0, 0, 0, 0.16),
+    0 28px 64px rgba(0, 0, 0, 0.22);
   --shadow-window-active:
-    0 0 0 0.5px rgba(0, 0, 0, 0.3),
-    0 2px 4px rgba(0, 0, 0, 0.1),
-    0 8px 24px rgba(0, 0, 0, 0.15),
-    0 24px 48px rgba(0, 0, 0, 0.2);
+    0 0 0 0.5px rgba(0, 0, 0, 0.36),
+    0 2px 8px rgba(0, 0, 0, 0.12),
+    0 14px 36px rgba(0, 0, 0, 0.22),
+    0 40px 80px rgba(0, 0, 0, 0.28);
   --shadow-dock:
-    0 0 0 0.5px rgba(255, 255, 255, 0.12),
-    0 8px 32px rgba(0, 0, 0, 0.35),
-    0 2px 8px rgba(0, 0, 0, 0.2);
-  --shadow-menubar: 0 0.5px 0 rgba(0, 0, 0, 0.3);
+    var(--glass-highlight-strong),
+    0 8px 32px rgba(0, 0, 0, 0.28),
+    0 2px 8px rgba(0, 0, 0, 0.16);
+  --shadow-menubar: 0 0.5px 0 rgba(255, 255, 255, 0.06);
   --shadow-context-menu:
-    0 0 0 0.5px rgba(255, 255, 255, 0.12),
-    0 12px 40px rgba(0, 0, 0, 0.5),
-    0 2px 8px rgba(0, 0, 0, 0.3);
+    var(--glass-highlight),
+    0 12px 40px rgba(0, 0, 0, 0.42),
+    0 2px 8px rgba(0, 0, 0, 0.22);
+  --shadow-toast:
+    var(--glass-highlight),
+    0 10px 32px rgba(0, 0, 0, 0.36),
+    0 2px 8px rgba(0, 0, 0, 0.18);
 
   /* Radii */
-  --radius-window: 10px;
+  --radius-window: 12px;
   --radius-dock: 20px;
-  --radius-button: 6px;
-  --radius-context-menu: 8px;
+  --radius-button: 7px;
+  --radius-context-menu: 10px;
+  --radius-control: 8px;
 
-  /* Spacing */
-  --titlebar-height: 28px;
+  /* Spacing / chrome */
+  --titlebar-height: 38px;
   --menubar-height: 28px;
   --dock-height: 72px;
   --dock-margin: 8px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
 
-  /* Typography — SF Pro system stack */
+  /* Type scale: few sizes, tight titles, quiet labels */
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-md: 13px;
+  --text-lg: 15px;
+  --text-xl: 22px;
+  --text-display: 32px;
+  --tracking-tight: -0.022em;
+  --tracking-snug: -0.014em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.06em;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 590;
+  --leading-tight: 1.15;
+  --leading-body: 1.45;
+
   --font-system: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', system-ui, sans-serif;
-  --font-mono: 'SF Mono', 'Menlo', 'Monaco', 'Fira Code', 'JetBrains Mono', monospace;
+  --font-mono: 'SF Mono', 'Menlo', 'Monaco', 'Fira Code', 'JetBrains Mono', ui-monospace, monospace;
 
-  /* Animation — spring-like curves */
+  /* Motion: fade+rise for chrome, quiet otherwise */
   --transition-fast: 120ms ease;
-  --transition-normal: 200ms ease;
-  --transition-slow: 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  --transition-spring: 500ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --transition-normal: 200ms cubic-bezier(0.22, 1, 0.36, 1);
+  --transition-slow: 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  --transition-spring: 480ms cubic-bezier(0.175, 0.885, 0.32, 1.175);
+  --rise-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --rise-chrome: 180ms var(--rise-ease);
+  --rise-panel: 380ms var(--rise-ease);
 
-  /* Z-index layers */
+  /* Z-index */
   --z-desktop: 0;
   --z-desktop-icons: 10;
   --z-windows: 100;
@@ -88,16 +132,19 @@
 }
 
 [data-theme='light'] {
-  --color-bg-desktop: #ececec;
-  --color-bg-surface: rgba(246, 246, 246, 0.96);
-  --color-bg-surface-solid: #f6f6f6;
-  --color-bg-titlebar: rgba(236, 236, 236, 0.96);
-  --color-bg-titlebar-inactive: rgba(232, 232, 232, 0.92);
-  --color-bg-dock: rgba(246, 246, 246, 0.75);
-  --color-bg-menubar: rgba(244, 244, 244, 0.88);
-  --color-bg-input: rgba(0, 0, 0, 0.04);
+  --color-bg-desktop: #e8e8ec;
+  --color-bg-surface: rgba(246, 246, 248, 0.62);
+  --color-bg-surface-solid: rgba(250, 250, 252, 0.9);
+  --color-bg-surface-inactive: rgba(242, 242, 244, 0.5);
+  --color-bg-titlebar: rgba(236, 236, 238, 0.48);
+  --color-bg-titlebar-inactive: rgba(232, 232, 234, 0.38);
+  --color-bg-sidebar: rgba(240, 240, 242, 0.5);
+  --color-bg-dock: rgba(250, 250, 252, 0.48);
+  --color-bg-menubar: rgba(246, 246, 248, 0.52);
+  --color-bg-input: rgba(0, 0, 0, 0.045);
   --color-bg-hover: rgba(0, 0, 0, 0.05);
   --color-bg-active: rgba(0, 0, 0, 0.08);
+  --color-bg-overlay: rgba(20, 20, 24, 0.28);
   --color-text-primary: #1d1d1f;
   --color-text-secondary: #6e6e73;
   --color-text-tertiary: #aeaeb2;
@@ -110,24 +157,35 @@
   --color-maximize: #28C840;
   --color-traffic-inactive: #d4d4d4;
   --color-border: rgba(0, 0, 0, 0.08);
-  --color-border-active: rgba(0, 0, 0, 0.12);
+  --color-border-active: rgba(0, 0, 0, 0.14);
+  --glass-highlight:
+    inset 0 0.5px 0 rgba(255, 255, 255, 0.72),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.35);
+  --glass-highlight-strong:
+    inset 0 0.6px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -0.5px 0 rgba(0, 0, 0, 0.06),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.5);
   --shadow-window:
-    0 0 0 0.5px rgba(0, 0, 0, 0.10),
-    0 2px 4px rgba(0, 0, 0, 0.04),
-    0 8px 24px rgba(0, 0, 0, 0.06),
-    0 24px 48px rgba(0, 0, 0, 0.08);
+    0 0 0 0.5px rgba(0, 0, 0, 0.08),
+    0 2px 6px rgba(0, 0, 0, 0.04),
+    0 10px 28px rgba(0, 0, 0, 0.08),
+    0 28px 56px rgba(0, 0, 0, 0.1);
   --shadow-window-active:
-    0 0 0 0.5px rgba(0, 0, 0, 0.16),
-    0 2px 4px rgba(0, 0, 0, 0.06),
-    0 8px 24px rgba(0, 0, 0, 0.10),
-    0 24px 48px rgba(0, 0, 0, 0.14);
+    0 0 0 0.5px rgba(0, 0, 0, 0.12),
+    0 2px 8px rgba(0, 0, 0, 0.06),
+    0 14px 36px rgba(0, 0, 0, 0.1),
+    0 40px 72px rgba(0, 0, 0, 0.14);
   --shadow-dock:
-    0 0 0 0.5px rgba(0, 0, 0, 0.1),
-    0 8px 32px rgba(0, 0, 0, 0.12),
-    0 2px 8px rgba(0, 0, 0, 0.06);
-  --shadow-menubar: 0 0.5px 0 rgba(0, 0, 0, 0.12);
+    var(--glass-highlight-strong),
+    0 8px 28px rgba(0, 0, 0, 0.1),
+    0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-menubar: 0 0.5px 0 rgba(0, 0, 0, 0.08);
   --shadow-context-menu:
-    0 0 0 0.5px rgba(0, 0, 0, 0.1),
-    0 12px 40px rgba(0, 0, 0, 0.15),
-    0 2px 8px rgba(0, 0, 0, 0.08);
+    var(--glass-highlight),
+    0 12px 40px rgba(0, 0, 0, 0.14),
+    0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-toast:
+    var(--glass-highlight),
+    0 10px 32px rgba(0, 0, 0, 0.12),
+    0 2px 8px rgba(0, 0, 0, 0.06);
 }

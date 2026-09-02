@@ -248,34 +248,49 @@ export function FileManager() {
 
         {/* Breadcrumbs */}
         <div className="flex items-center gap-0.5 flex-1 min-w-0 overflow-hidden ml-2">
-          <button
-            className="shrink-0 px-1 rounded"
-            style={{ fontSize: '12px', color: 'var(--color-text-tertiary)', background: 'transparent' }}
-            onClick={() => handleBreadcrumbClick(-1)}
-          >
-            /
-          </button>
-          {breadcrumbs.map((part, i) => (
-            <span key={i} className="flex items-center gap-0.5 shrink-0">
-              <span style={{ color: 'var(--color-text-tertiary)', fontSize: '11px' }}>{'\u203A'}</span>
-              <button
-                className="px-1 rounded truncate"
-                style={{
-                  fontSize: '12px',
-                  color:
-                    i === breadcrumbs.length - 1
-                      ? 'var(--color-text-primary)'
-                      : 'var(--color-text-secondary)',
-                  fontWeight: i === breadcrumbs.length - 1 ? 500 : 400,
-                  background: 'transparent',
-                  maxWidth: '120px',
-                }}
-                onClick={() => handleBreadcrumbClick(i)}
-              >
-                {part}
-              </button>
-            </span>
-          ))}
+          {breadcrumbs.length === 0 ? (
+            <button
+              className="shrink-0 px-1 rounded"
+              style={{ fontSize: '12px', color: 'var(--color-text-tertiary)', background: 'transparent' }}
+              onClick={() => handleBreadcrumbClick(-1)}
+            >
+              /
+            </button>
+          ) : (
+            breadcrumbs.map((part, i) => {
+              const label =
+                part === 'home' && i === 0
+                  ? '~'
+                  : part === 'rahul' && i === 1
+                    ? 'Home'
+                    : part;
+              return (
+                <span key={i} className="flex items-center gap-0.5 shrink-0">
+                  {i > 0 && (
+                    <span style={{ color: 'var(--color-text-tertiary)', fontSize: '11px' }}>
+                      {'\u203A'}
+                    </span>
+                  )}
+                  <button
+                    className="px-1 rounded truncate"
+                    style={{
+                      fontSize: '12px',
+                      color:
+                        i === breadcrumbs.length - 1
+                          ? 'var(--color-text-primary)'
+                          : 'var(--color-text-secondary)',
+                      fontWeight: i === breadcrumbs.length - 1 ? 500 : 400,
+                      background: 'transparent',
+                      maxWidth: '120px',
+                    }}
+                    onClick={() => handleBreadcrumbClick(i)}
+                  >
+                    {label}
+                  </button>
+                </span>
+              );
+            })
+          )}
         </div>
 
         {/* View toggle */}

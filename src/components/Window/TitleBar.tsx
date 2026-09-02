@@ -124,9 +124,11 @@ export function TitleBar({
             width: '14px',
             height: '14px',
             flexShrink: 0,
-            borderRadius: '3px',
+            borderRadius: '3.5px',
             overflow: 'hidden',
-            opacity: isActive ? 1 : 0.7,
+            opacity: isActive ? 1 : 0.72,
+            background: 'rgba(255,255,255,0.1)',
+            boxShadow: '0 0 0 0.5px rgba(255,255,255,0.22)',
           }}
         >
           <AppIcon appId={appId} />

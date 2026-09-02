@@ -35,11 +35,11 @@ export function TerminalIcon() {
     <svg viewBox="0 0 120 120" width="100%" height="100%" aria-hidden>
       <defs>
         <linearGradient id={`${uid}-bg`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#2a2a2a" />
-          <stop offset="100%" stopColor="#0d0d0d" />
+          <stop offset="0%" stopColor="#3F3F46" />
+          <stop offset="100%" stopColor="#18181B" />
         </linearGradient>
       </defs>
-      <Squircle fill={`url(#${uid}-bg)`} stroke="rgba(255,255,255,0.1)" />
+      <Squircle fill={`url(#${uid}-bg)`} stroke="rgba(255,255,255,0.22)" />
       <path
         d="M32 74L54 56L32 38"
         stroke="#32D74B"
